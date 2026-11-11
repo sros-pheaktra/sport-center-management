@@ -1,57 +1,43 @@
 
-const jwt = require('jsonwebtoken')
 const pool = require('../config/db')
 
 const authenticate = async (req, res, next) => {
     try {
-        const authHeader = req.headers.authorization
-
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        // Check whether a session exists
+        if (!req.session || !req.session.userId) {
             return res.status(401).json({
-                message: 'Access denied. No token provided.'
+                message: 'Access denied. Please log in.'
             })
         }
 
-        const token = authHeader.split(' ')[1]
-
-        const decoded = jwt.verify(
-            token,
-            process.env.JWT_SECRET
-        )
-
+        // Get the latest user information from MySQL
         const [users] = await pool.query(
             `SELECT id, full_name, email, role, status
              FROM users
              WHERE id = ?`,
-            [decoded.id]
+            [req.session.userId]
         )
 
         if (users.length === 0 || users[0].status !== 'active') {
+            req.session.destroy(() => {})
+
             return res.status(401).json({
-                message: 'Account not found or inactive'
+                message: 'Account not found or inactive.'
             })
         }
 
-        // Use current database role, not an old JWT role
+        // Attach current user information to request
         req.user = users[0]
 
         next()
 
     } catch (error) {
-        if (error.name === 'JsonWebTokenError' ||
-            error.name === 'TokenExpiredError') {
-            return res.status(401).json({
-                message: 'Invalid or expired token'
-            })
-        }
-
         console.error('Authentication error:', error.message)
 
-        return res.status(500).json({
-            message: 'Authentication failed'
-        })
+        next(error)
     }
 }
+
 const authorize = (...roles) => {
     return (req, res, next) => {
         if (!req.user || !roles.includes(req.user.role)) {
@@ -63,6 +49,7 @@ const authorize = (...roles) => {
         next()
     }
 }
+
 module.exports = {
     authenticate,
     authorize

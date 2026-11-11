@@ -27,8 +27,6 @@ exports.getFacilities = async (req, res) => {
         });
     }
 };
-
-
 // GET /api/facilities/:id
 // Get one facility
 exports.getFacilityById = async (req, res) => {
@@ -286,3 +284,4 @@ exports.updateFacilityStatus = async (req, res) => {
         });
     }
 };
+

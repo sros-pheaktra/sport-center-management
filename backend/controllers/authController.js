@@ -1,10 +1,8 @@
-
 const pool = require('../config/db')
 const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
 
 // POST /api/auth/login
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body
 
@@ -15,7 +13,7 @@ exports.login = async (req, res) => {
         }
 
         const [users] = await pool.query(
-            `SELECT id, full_name, email, password, role, status
+            `SELECT id, full_name, email, password, phone, role, status
              FROM users
              WHERE email = ?`,
             [email.trim().toLowerCase()]
@@ -46,31 +44,35 @@ exports.login = async (req, res) => {
             })
         }
 
-        const token = jwt.sign(
-            {
-                id: user.id,
-                role: user.role
-            },
-            process.env.JWT_SECRET,
-            {
-                expiresIn: process.env.JWT_EXPIRES_IN || '1d'
+        // Regenerate session to prevent session fixation
+        req.session.regenerate((err) => {
+            if (err) {
+                return next(err)
             }
-        )
 
-        return res.status(200).json({
-            message: 'Login successful',
-            token,
-            user: {
-                id: user.id,
-                full_name: user.full_name,
-                email: user.email,
-                role: user.role
-            }
+            // Store user ID in session
+            req.session.userId = user.id
+
+            req.session.save((err) => {
+                if (err) {
+                    return next(err)
+                }
+
+                return res.status(200).json({
+                    message: 'Login successful',
+                    user: {
+                        id: user.id,
+                        full_name: user.full_name,
+                        email: user.email,
+                        phone: user.phone,
+                        role: user.role
+                    }
+                })
+            })
         })
 
     } catch (error) {
         console.error('Login error:', error.message)
-
         return res.status(500).json({
             message: 'Internal server error'
         })
@@ -84,7 +86,7 @@ exports.getMe = async (req, res) => {
             `SELECT id, full_name, email, phone, role, status
              FROM users
              WHERE id = ?`,
-            [req.user.id]
+            [req.session.userId]
         )
 
         if (users.length === 0) {
@@ -113,8 +115,21 @@ exports.getMe = async (req, res) => {
 }
 
 // POST /api/auth/logout
-exports.logout = (req, res) => {
-    return res.status(200).json({
-        message: 'Logout successful. Please remove your token.'
+exports.logout = (req, res, next) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return next(err)
+        }
+
+        res.clearCookie('sportcenter.sid', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/'
+        })
+
+        return res.status(200).json({
+            message: 'Logout successful'
+        })
     })
 }
