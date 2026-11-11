@@ -29,7 +29,7 @@ frontend that talks to the REST API with `fetch`.
 
 ## Database
 
-Three related tables (see `database/`):
+Three related tables (see `backend/database/`):
 
 | Table         | Purpose                                        |
 | ------------- | ---------------------------------------------- |
@@ -37,8 +37,8 @@ Three related tables (see `database/`):
 | `categories`  | Facility categories (Football, Basketball, …). |
 | `facilities`  | The main records. Foreign keys to its owner (`users.id`) and its `categories.id`. |
 
-- `database/schema.sql` — creates the database and the three tables.
-- `database/seed.sql` — seeds 4 users, 7 categories and **10 fictional
+- `backend/database/schema.sql` — creates the database and the three tables.
+- `backend/database/seed.sql` — seeds 4 users, 7 categories and **10 fictional
   sample facilities**.
 
 ## Demo account
@@ -71,9 +71,11 @@ before it is inserted.
 
 ### 1. Configure the environment
 
-Copy `.env.example` to `.env` and fill in your own MySQL credentials:
+Copy `.env.example` to `.env` inside the `backend/` folder and fill in
+your own MySQL credentials:
 
 ```
+cd backend
 cp .env.example .env
 ```
 
@@ -94,15 +96,20 @@ placeholders) is versioned.
 
 ### 2. Create and seed the database
 
+From the `backend/` folder:
+
 ```
 npm run db:setup
 ```
 
 This runs `database/schema.sql` followed by `database/seed.sql` using
-the credentials from `.env`. (You can also run the two files manually
-with the MySQL CLI: `mysql -u your_user -p < database/schema.sql` etc.)
+the credentials from `backend/.env`. (You can also run the two files
+manually with the MySQL CLI: `mysql -u your_user -p < backend/database/schema.sql`
+etc.)
 
 ### 3. Install and start the API server
+
+From the `backend/` folder:
 
 ```
 npm install
@@ -114,7 +121,7 @@ nodemon).
 
 ### 4. Install and start the frontend
 
-In a second terminal:
+In a second terminal, from the `frontend/` folder:
 
 ```
 cd frontend
@@ -129,26 +136,29 @@ extra CORS setup.
 ## Project structure
 
 ```
-├── app.js                    Express entry point
-├── config/
-│   ├── db.js                 MySQL connection pool (credentials from .env)
-│   └── session.js            Session middleware
-├── routes/
-│   ├── authRoutes.js         Registration / login / logout / current user
-│   ├── facilityRoutes.js     Main resource (browse, search, CRUD)
-│   └── categoryRoutes.js    Categories for forms and filters
-├── controllers/
-│   ├── authController.js
-│   ├── facilityController.js
-│   └── categoryController.js
-├── middleware/
-│   ├── authMiddleware.js     Session check (req.user)
-│   └── uploadMiddleware.js   Multer: JPEG/PNG only, ≤ 2 MB, UUID filenames
-├── database/
-│   ├── schema.sql            Creates the three related tables
-│   └── seed.sql              Sample categories, users and 10 facilities
-├── uploads/                  Uploaded images (runtime, gitignored)
-├── scripts/setupDb.js        npm run db:setup
+├── backend/                  Express REST API
+│   ├── app.js                Entry point
+│   ├── config/
+│   │   ├── db.js             MySQL connection pool (credentials from .env)
+│   │   └── session.js        Session middleware
+│   ├── routes/
+│   │   ├── authRoutes.js     Registration / login / logout / current user
+│   │   ├── facilityRoutes.js Main resource (browse, search, CRUD)
+│   │   └── categoryRoutes.js Categories for forms and filters
+│   ├── controllers/
+│   │   ├── authController.js
+│   │   ├── facilityController.js
+│   │   └── categoryController.js
+│   ├── middleware/
+│   │   ├── authMiddleware.js Session check (req.user)
+│   │   └── uploadMiddleware.js Multer: JPEG/PNG only, ≤ 2 MB, UUID filenames
+│   ├── database/
+│   │   ├── schema.sql        Creates the three related tables
+│   │   └── seed.sql          Sample categories, users and 10 facilities
+│   ├── uploads/              Uploaded images (runtime, gitignored)
+│   ├── scripts/setupDb.js   npm run db:setup
+│   ├── .env / .env.example  Environment settings (real file gitignored)
+│   └── package.json
 └── frontend/                 React + Vite SPA (fetch-based)
     └── src/
         ├── api.js            fetch wrapper (cookies included)
@@ -191,7 +201,7 @@ extra CORS setup.
 - **Errors** are logged server-side and answered with short, generic
   JSON messages — no stack traces, passwords or DB credentials are
   ever exposed to clients.
-- **Database credentials** live in `.env` (gitignored); only
+- **Database credentials** live in `backend/.env` (gitignored); only
   `.env.example` with placeholder values is committed.
 - Sessions use the express-session default in-memory store (as taught
   in class) — fine for development; restarting the server logs
