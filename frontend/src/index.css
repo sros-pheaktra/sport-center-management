@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+/* Keep long descriptions readable */
+.description-text {
+  white-space: pre-line;
+}
