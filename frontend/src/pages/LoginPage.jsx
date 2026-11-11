@@ -1,12 +1,22 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import { isStaffSide } from '../utils/roles'
+
+const DEMO_ACCOUNTS = [
+  { label: 'Admin', email: 'admin@sportcenter.test', password: 'Admin1234!' },
+  { label: 'Manager', email: 'manager@sportcenter.test', password: 'Manager1234!' },
+  { label: 'Staff', email: 'staff@sportcenter.test', password: 'Staff1234!' },
+  { label: 'Customer', email: 'demo@sportcenter.test', password: 'Demo1234!' }
+]
 
 export default function LoginPage() {
   const { login } = useAuth()
   const { success } = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from
 
   const [form, setForm] = useState({ email: '', password: '' })
   const [formError, setFormError] = useState('')
@@ -27,7 +37,11 @@ export default function LoginPage() {
     try {
       const data = await login(form)
       success(`Welcome back, ${data.user.full_name.split(' ')[0]}!`)
-      navigate('/')
+
+      // Staff-side roles land on the dashboard; everyone else on
+      // the facility browser (or wherever they were heading)
+      const target = from || (isStaffSide(data.user) ? '/dashboard' : '/')
+      navigate(target)
     } catch (err) {
       setFormError(err.message || 'Login failed. Please try again.')
     } finally {
@@ -40,7 +54,7 @@ export default function LoginPage() {
       <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-2xl font-bold text-slate-900">Log in</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Welcome back! Log in to add and manage your facilities.
+          Welcome back! Log in to manage the sport center or your bookings.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
@@ -110,9 +124,17 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <p className="mt-4 rounded-md bg-slate-100 px-4 py-3 text-center text-xs text-slate-500">
-        Demo account: <span className="font-medium">demo@sportcenter.test</span> / <span className="font-medium">Demo1234!</span>
-      </p>
+      <div className="mt-4 rounded-md bg-slate-100 px-4 py-3">
+        <p className="text-center text-xs font-semibold text-slate-500">Demo accounts</p>
+        <ul className="mt-2 space-y-1 text-center text-xs text-slate-500">
+          {DEMO_ACCOUNTS.map((account) => (
+            <li key={account.email}>
+              <span className="font-medium text-slate-600">{account.label}:</span>{' '}
+              {account.email} / {account.password}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }

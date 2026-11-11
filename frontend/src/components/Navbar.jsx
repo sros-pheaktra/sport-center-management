@@ -1,6 +1,8 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import RoleBadge from './RoleBadge'
+import { canManageContent, canManageUsers, isStaffSide } from '../utils/roles'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -17,6 +19,11 @@ export default function Navbar() {
     }
   }
 
+  const linkClass = ({ isActive }) =>
+    `rounded-md px-3 py-2 text-sm font-medium ${
+      isActive ? 'text-emerald-700' : 'text-slate-600 hover:text-slate-900'
+    }`
+
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
@@ -25,28 +32,40 @@ export default function Navbar() {
           <span className="text-lg">Sport Center</span>
         </Link>
 
-        <nav className="flex items-center gap-2 sm:gap-4">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `rounded-md px-3 py-2 text-sm font-medium ${
-                isActive ? 'text-emerald-700' : 'text-slate-600 hover:text-slate-900'
-              }`
-            }
-          >
+        <nav className="flex items-center gap-1 sm:gap-2">
+          <NavLink to="/" className={linkClass}>
             Facilities
           </NavLink>
 
+          {/* Staff-side navigation grows in later phases (bookings,
+              schedules, maintenance, …) */}
+          {isStaffSide(user) && (
+            <NavLink to="/dashboard" className={linkClass}>
+              Dashboard
+            </NavLink>
+          )}
+
+          {canManageUsers(user) && (
+            <NavLink to="/users" className={linkClass}>
+              Users
+            </NavLink>
+          )}
+
+          {canManageContent(user) && (
+            <NavLink to="/categories" className={linkClass}>
+              Categories
+            </NavLink>
+          )}
+
           {user ? (
             <>
-              <span className="hidden text-sm text-slate-500 sm:inline" title={user.email}>
-                Hi, {user.full_name.split(' ')[0]}
-              </span>
               <Link
-                to="/facilities/new"
-                className="rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                to="/profile"
+                title={user.email}
+                className="ml-1 hidden items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 md:inline-flex"
               >
-                + Add Facility
+                <span className="font-medium">{user.full_name.split(' ')[0]}</span>
+                <RoleBadge role={user.role} />
               </Link>
               <button
                 type="button"

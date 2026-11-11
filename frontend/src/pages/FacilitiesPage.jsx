@@ -4,6 +4,7 @@ import { api } from '../api'
 import { useAuth } from '../context/AuthContext'
 import FacilityCard from '../components/FacilityCard'
 import Loading from '../components/Loading'
+import { canManageContent } from '../utils/roles'
 
 export default function FacilitiesPage() {
   const { user } = useAuth()
@@ -51,7 +52,7 @@ export default function FacilitiesPage() {
             Browse all facilities, or narrow things down with the search and filters.
           </p>
         </div>
-        {user && (
+        {canManageContent(user) && (
           <Link
             to="/facilities/new"
             className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
@@ -100,6 +101,7 @@ export default function FacilitiesPage() {
           <option value="">Any status</option>
           <option value="available">Available</option>
           <option value="unavailable">Unavailable</option>
+          <option value="maintenance">Under maintenance</option>
         </select>
 
         {hasFilters && (
@@ -190,7 +192,7 @@ function FacilityResults({ search, categoryId, status, hasFilters, onClearFilter
               Clear filters
             </button>
           )}
-          {user && (
+          {canManageContent(user) && (
             <Link
               to="/facilities/new"
               className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"

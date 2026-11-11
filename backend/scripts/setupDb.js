@@ -31,7 +31,11 @@ async function main() {
 
     console.log('Database setup complete.')
     console.log('')
-    console.log('Demo account:  email: demo@sportcenter.test   password: Demo1234!')
+    console.log('Demo accounts:')
+    console.log('  admin    admin@sportcenter.test    Admin1234!')
+    console.log('  manager  manager@sportcenter.test  Manager1234!')
+    console.log('  staff    staff@sportcenter.test    Staff1234!')
+    console.log('  customer demo@sportcenter.test     Demo1234!')
 }
 
 main().catch((err) => {

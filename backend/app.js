@@ -10,6 +10,8 @@ const sessionMiddleware = require('./config/session')
 const authRoutes = require('./routes/authRoutes')
 const facilityRoutes = require('./routes/facilityRoutes')
 const categoryRoutes = require('./routes/categoryRoutes')
+const userRoutes = require('./routes/userRoutes')
+const dashboardRoutes = require('./routes/dashboardRoutes')
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -35,12 +37,14 @@ app.get('/', (req, res) => {
         message: 'Sport Center Management API',
         docs: {
             facilities: '/api/facilities',
-            categories: '/api/categories'
+            categories: '/api/categories',
+            users: '/api/users (admin/manager)',
+            dashboard: '/api/dashboard/stats (admin/manager/staff)'
         }
     })
 })
 
-// Authentication (registration, login, logout, current user)
+// Authentication (registration, login, logout, current user, own profile)
 app.use('/api/auth', authRoutes)
 
 // Facilities (main resource)
@@ -48,6 +52,12 @@ app.use('/api/facilities', facilityRoutes)
 
 // Categories (used by the facility forms and filters)
 app.use('/api/categories', categoryRoutes)
+
+// User & staff management (admin/manager)
+app.use('/api/users', userRoutes)
+
+// Dashboard statistics (admin/manager/staff)
+app.use('/api/dashboard', dashboardRoutes)
 
 // Unknown routes
 app.use((req, res) => {

@@ -7,7 +7,8 @@ import StatusBadge from '../components/StatusBadge'
 import FacilityImage from '../components/FacilityImage'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Loading from '../components/Loading'
-import { formatDate } from '../utils/format'
+import { formatDate, formatPrice, formatTime } from '../utils/format'
+import { canManageContent } from '../utils/roles'
 
 export default function FacilityDetailPage() {
   const { id } = useParams()
@@ -93,7 +94,7 @@ function FacilityDetail({ id }) {
     )
   }
 
-  const isOwner = user && user.id === facility.user_id
+  const canManage = canManageContent(user)
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -122,6 +123,29 @@ function FacilityDetail({ id }) {
               <span>listed by {facility.owner_name}</span>
             </div>
 
+            {/* Pricing and booking details */}
+            <dl className="grid grid-cols-3 gap-3 rounded-lg bg-slate-50 p-4 text-center">
+              <div>
+                <dt className="text-xs text-slate-500">Price</dt>
+                <dd className="mt-1 text-sm font-semibold text-slate-800">
+                  {formatPrice(facility.price_per_hour)}
+                  <span className="font-normal text-slate-500">/hour</span>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">Capacity</dt>
+                <dd className="mt-1 text-sm font-semibold text-slate-800">
+                  {facility.capacity ?? '—'}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs text-slate-500">Open hours</dt>
+                <dd className="mt-1 text-sm font-semibold text-slate-800">
+                  {formatTime(facility.open_time)}–{formatTime(facility.close_time)}
+                </dd>
+              </div>
+            </dl>
+
             <p className="description-text text-slate-700">{facility.description}</p>
 
             <div className="mt-auto border-t border-slate-100 pt-4 text-xs text-slate-400">
@@ -131,8 +155,9 @@ function FacilityDetail({ id }) {
               )}
             </div>
 
-            {/* Only the owner sees these — the server re-checks ownership anyway */}
-            {isOwner && (
+            {/* Only admins and managers see these — the server
+                re-checks the role on every write anyway */}
+            {canManage && (
               <div className="flex gap-3">
                 <Link
                   to={`/facilities/${facility.id}/edit`}

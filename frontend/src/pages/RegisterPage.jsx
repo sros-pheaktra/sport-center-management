@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({
     full_name: '',
     email: '',
+    phone: '',
     password: '',
     confirm_password: ''
   })
@@ -62,7 +63,7 @@ export default function RegisterPage() {
       <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-2xl font-bold text-slate-900">Create an account</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Register to list your own facilities and manage them later.
+          Register as a customer to book the center's facilities.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
@@ -108,6 +109,22 @@ export default function RegisterPage() {
             {fieldErrors.email && (
               <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
             )}
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block text-sm font-medium text-slate-700">
+              Phone <span className="text-slate-400">(optional)</span>
+            </label>
+            <input
+              id="phone"
+              type="tel"
+              autoComplete="tel"
+              maxLength={30}
+              value={form.phone}
+              onChange={(event) => setForm({ ...form, phone: event.target.value })}
+              placeholder="+1 555-0100"
+              className={inputClass('phone')}
+            />
           </div>
 
           <div>

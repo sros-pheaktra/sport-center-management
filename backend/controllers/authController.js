@@ -8,6 +8,7 @@ const asyncHandler = require('../utils/asyncHandler')
 const SALT_ROUNDS = 10
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const PHONE_PATTERN = /^[+\d][\d\s()-]{2,29}$/
 
 // Creates a fresh session for a user id. Regenerating the session
 // id at login prevents session fixation.
@@ -24,12 +25,31 @@ const startSession = (req, userId) => new Promise((resolve, reject) => {
     })
 })
 
+// The safe user fields every auth response returns (never the hash)
+const publicUser = (user) => ({
+    id: user.id,
+    full_name: user.full_name,
+    email: user.email,
+    phone: user.phone || null,
+    role: user.role
+})
+
+// Validates an optional phone number (may be empty/null)
+const cleanPhone = (phone) => {
+    if (phone === undefined || phone === null) return null
+    const trimmed = String(phone).trim()
+    return trimmed === '' ? null : trimmed
+}
+
 // POST /api/auth/register
+// Public sign-up — always creates a CUSTOMER account. Staff,
+// manager and admin accounts are created through user management.
 exports.register = asyncHandler(async (req, res) => {
     const full_name = (req.body.full_name || '').trim()
     const email = (req.body.email || '').trim().toLowerCase()
     const password = req.body.password || ''
     const confirm_password = req.body.confirm_password || ''
+    const phone = cleanPhone(req.body.phone)
 
     // Server-side validation
     if (full_name.length < 2 || full_name.length > 100) {
@@ -41,6 +61,12 @@ exports.register = asyncHandler(async (req, res) => {
     if (!EMAIL_PATTERN.test(email) || email.length > 150) {
         return res.status(400).json({
             message: 'Please enter a valid email address'
+        })
+    }
+
+    if (phone && !PHONE_PATTERN.test(phone)) {
+        return res.status(400).json({
+            message: 'Please enter a valid phone number'
         })
     }
 
@@ -72,9 +98,9 @@ exports.register = asyncHandler(async (req, res) => {
     const passwordHash = await bcrypt.hash(password, SALT_ROUNDS)
 
     const [result] = await db.query(
-        `INSERT INTO users (full_name, email, password)
-         VALUES (?, ?, ?)`,
-        [full_name, email, passwordHash]
+        `INSERT INTO users (full_name, email, password, phone, role)
+         VALUES (?, ?, ?, ?, 'customer')`,
+        [full_name, email, passwordHash, phone]
     )
 
     // Log the new user in right away
@@ -85,7 +111,9 @@ exports.register = asyncHandler(async (req, res) => {
         user: {
             id: result.insertId,
             full_name,
-            email
+            email,
+            phone,
+            role: 'customer'
         }
     })
 })
@@ -102,7 +130,8 @@ exports.login = asyncHandler(async (req, res) => {
     }
 
     const [users] = await db.query(
-        'SELECT id, full_name, email, password FROM users WHERE email = ?',
+        `SELECT id, full_name, email, phone, role, is_active, password
+         FROM users WHERE email = ?`,
         [email]
     )
 
@@ -124,15 +153,17 @@ exports.login = asyncHandler(async (req, res) => {
         })
     }
 
+    if (!user.is_active) {
+        return res.status(403).json({
+            message: 'This account has been deactivated. Please contact an administrator.'
+        })
+    }
+
     await startSession(req, user.id)
 
     res.json({
         message: 'Login successful',
-        user: {
-            id: user.id,
-            full_name: user.full_name,
-            email: user.email
-        }
+        user: publicUser(user)
     })
 })
 
@@ -164,17 +195,95 @@ exports.getMe = asyncHandler(async (req, res) => {
     }
 
     const [users] = await db.query(
-        'SELECT id, full_name, email FROM users WHERE id = ?',
+        `SELECT id, full_name, email, phone, role, is_active
+         FROM users WHERE id = ?`,
         [req.session.userId]
     )
 
-    if (users.length === 0) {
+    if (users.length === 0 || !users[0].is_active) {
         return res.status(401).json({
             message: 'Not logged in'
         })
     }
 
     res.json({
-        user: users[0]
+        user: publicUser(users[0])
+    })
+})
+
+// PUT /api/auth/profile  (any logged-in user, own account only)
+exports.updateProfile = asyncHandler(async (req, res) => {
+    const full_name = (req.body.full_name || '').trim()
+    const phone = cleanPhone(req.body.phone)
+
+    if (full_name.length < 2 || full_name.length > 100) {
+        return res.status(400).json({
+            message: 'Full name must be between 2 and 100 characters'
+        })
+    }
+
+    if (phone && !PHONE_PATTERN.test(phone)) {
+        return res.status(400).json({
+            message: 'Please enter a valid phone number'
+        })
+    }
+
+    await db.query(
+        'UPDATE users SET full_name = ?, phone = ? WHERE id = ?',
+        [full_name, phone, req.user.id]
+    )
+
+    res.json({
+        message: 'Profile updated successfully',
+        user: { ...publicUser(req.user), full_name, phone }
+    })
+})
+
+// PUT /api/auth/password  (any logged-in user, own account only)
+exports.changePassword = asyncHandler(async (req, res) => {
+    const current_password = req.body.current_password || ''
+    const new_password = req.body.new_password || ''
+    const confirm_password = req.body.confirm_password || ''
+
+    if (!current_password) {
+        return res.status(400).json({
+            message: 'Your current password is required'
+        })
+    }
+
+    if (new_password.length < 8 || new_password.length > 72) {
+        return res.status(400).json({
+            message: 'New password must be between 8 and 72 characters'
+        })
+    }
+
+    if (new_password !== confirm_password) {
+        return res.status(400).json({
+            message: 'New passwords do not match'
+        })
+    }
+
+    const [users] = await db.query(
+        'SELECT password FROM users WHERE id = ?',
+        [req.user.id]
+    )
+
+    const isMatch = await bcrypt.compare(current_password, users[0].password)
+
+    if (!isMatch) {
+        return res.status(401).json({
+            message: 'Your current password is incorrect'
+        })
+    }
+
+    const passwordHash = await bcrypt.hash(new_password, SALT_ROUNDS)
+
+    await db.query(
+        'UPDATE users SET password = ? WHERE id = ?',
+        [passwordHash, req.user.id]
+    )
+
+    res.json({
+        message: 'Password changed successfully'
     })
 })

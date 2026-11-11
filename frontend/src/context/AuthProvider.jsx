@@ -35,8 +35,14 @@ export function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
+  // Keeps the context in sync after the user edits their own
+  // profile (name/phone) on the profile page
+  const updateUser = useCallback((updated) => {
+    setUser((current) => ({ ...current, ...updated }))
+  }, [])
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   )

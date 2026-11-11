@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../api'
-import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import Loading from '../components/Loading'
 import FacilityImage from '../components/FacilityImage'
+import { formatTime } from '../utils/format'
 
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024 // 2 MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png']
@@ -13,7 +13,11 @@ const emptyForm = {
   title: '',
   description: '',
   category_id: '',
-  status: 'available'
+  status: 'available',
+  price_per_hour: '',
+  capacity: '',
+  open_time: '08:00',
+  close_time: '22:00'
 }
 
 export default function FacilityFormPage({ mode }) {
@@ -31,7 +35,6 @@ export default function FacilityFormPage({ mode }) {
 
 function FacilityForm({ mode, id }) {
   const isEdit = mode === 'edit'
-  const { user, loading: authLoading } = useAuth()
   const { success, error: toastError } = useToast()
   const navigate = useNavigate()
 
@@ -44,7 +47,6 @@ function FacilityForm({ mode, id }) {
   const [fieldErrors, setFieldErrors] = useState({})
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(isEdit)
-  const [forbidden, setForbidden] = useState(false)
   const [notFound, setNotFound] = useState(false)
 
   // Load categories for the dropdown
@@ -67,17 +69,16 @@ function FacilityForm({ mode, id }) {
     api(`/facilities/${id}`)
       .then((data) => {
         if (!active) return
-        if (user && data.facility.user_id !== user.id) {
-          setForbidden(true)
-          setLoading(false)
-          return
-        }
         setFacility(data.facility)
         setForm({
           title: data.facility.title,
           description: data.facility.description,
           category_id: String(data.facility.category_id),
-          status: data.facility.status
+          status: data.facility.status,
+          price_per_hour: String(data.facility.price_per_hour ?? ''),
+          capacity: data.facility.capacity == null ? '' : String(data.facility.capacity),
+          open_time: formatTime(data.facility.open_time) || '08:00',
+          close_time: formatTime(data.facility.close_time) || '22:00'
         })
         setLoading(false)
       })
@@ -89,7 +90,7 @@ function FacilityForm({ mode, id }) {
       })
 
     return () => { active = false }
-  }, [id, isEdit, user, toastError])
+  }, [id, isEdit, toastError])
 
   // Basic client-side checks; the server validates everything again
   const validate = () => {
@@ -101,6 +102,22 @@ function FacilityForm({ mode, id }) {
     if (!form.description.trim()) errors.description = 'Description is required.'
 
     if (!form.category_id) errors.category_id = 'Please choose a category.'
+
+    const price = Number(form.price_per_hour)
+    if (form.price_per_hour === '' || !Number.isFinite(price) || price < 0) {
+      errors.price_per_hour = 'Enter a valid hourly price (0 or more).'
+    }
+
+    if (form.capacity !== '') {
+      const capacity = Number(form.capacity)
+      if (!Number.isInteger(capacity) || capacity < 1) {
+        errors.capacity = 'Capacity must be a whole number of at least 1.'
+      }
+    }
+
+    if (form.close_time && form.open_time && form.close_time <= form.open_time) {
+      errors.close_time = 'Closing time must be after opening time.'
+    }
 
     return errors
   }
@@ -154,6 +171,12 @@ function FacilityForm({ mode, id }) {
     body.set('description', form.description.trim())
     body.set('category_id', form.category_id)
     body.set('status', form.status)
+    body.set('price_per_hour', form.price_per_hour)
+    if (form.capacity !== '') {
+      body.set('capacity', form.capacity)
+    }
+    body.set('open_time', form.open_time)
+    body.set('close_time', form.close_time)
     if (imageFile) {
       body.set('image', imageFile)
     }
@@ -173,33 +196,7 @@ function FacilityForm({ mode, id }) {
     }
   }
 
-  // Not logged in → ask them to log in first
-  if (!authLoading && !user) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <h1 className="text-xl font-semibold text-slate-800">Please log in first</h1>
-        <p className="mt-2 text-slate-600">
-          You need an account to {isEdit ? 'edit' : 'add'} a facility.
-        </p>
-        <div className="mt-6 flex justify-center gap-3">
-          <Link
-            to="/login"
-            className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
-          >
-            Log in
-          </Link>
-          <Link
-            to="/register"
-            className="rounded-md border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-          >
-            Create an account
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-8">
         <Loading label="Loading…" />
@@ -212,25 +209,7 @@ function FacilityForm({ mode, id }) {
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <h1 className="text-xl font-semibold text-slate-800">Facility not found</h1>
         <p className="mt-2 text-slate-600">
-          This facility does not exist — it may have been deleted by its owner.
-        </p>
-        <Link
-          to="/"
-          className="mt-6 inline-block rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
-        >
-          ← Back to all facilities
-        </Link>
-      </div>
-    )
-  }
-
-  // Trying to edit someone else's facility
-  if (forbidden) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <h1 className="text-xl font-semibold text-slate-800">You can only edit your own facilities</h1>
-        <p className="mt-2 text-slate-600">
-          This facility belongs to another member, so it cannot be edited here.
+          This facility does not exist — it may have been deleted.
         </p>
         <Link
           to="/"
@@ -250,7 +229,7 @@ function FacilityForm({ mode, id }) {
       <p className="mt-1 text-slate-600">
         {isEdit
           ? 'Update the details below. Leave the image empty to keep the current photo.'
-          : 'Fill in the details to list a facility you own.'}
+          : 'Fill in the details to add the facility to the center.'}
       </p>
 
       <form
@@ -346,7 +325,94 @@ function FacilityForm({ mode, id }) {
             >
               <option value="available">Available</option>
               <option value="unavailable">Unavailable</option>
+              <option value="maintenance">Under maintenance</option>
             </select>
+            <p className="mt-1 text-xs text-slate-500">
+              Facilities under maintenance cannot be booked.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="price_per_hour" className="block text-sm font-medium text-slate-700">
+              Price per hour <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="price_per_hour"
+              type="number"
+              min="0"
+              max="99999.99"
+              step="0.01"
+              value={form.price_per_hour}
+              onChange={(event) => setForm({ ...form, price_per_hour: event.target.value })}
+              placeholder="e.g. 25.00"
+              className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                fieldErrors.price_per_hour
+                  ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+              }`}
+            />
+            {fieldErrors.price_per_hour && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.price_per_hour}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="capacity" className="block text-sm font-medium text-slate-700">
+              Capacity <span className="text-slate-400">(optional)</span>
+            </label>
+            <input
+              id="capacity"
+              type="number"
+              min="1"
+              step="1"
+              value={form.capacity}
+              onChange={(event) => setForm({ ...form, capacity: event.target.value })}
+              placeholder="e.g. 12 players"
+              className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                fieldErrors.capacity
+                  ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+              }`}
+            />
+            {fieldErrors.capacity && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.capacity}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="open_time" className="block text-sm font-medium text-slate-700">
+              Opens at <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="open_time"
+              type="time"
+              value={form.open_time}
+              onChange={(event) => setForm({ ...form, open_time: event.target.value })}
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            />
+          </div>
+          <div>
+            <label htmlFor="close_time" className="block text-sm font-medium text-slate-700">
+              Closes at <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="close_time"
+              type="time"
+              value={form.close_time}
+              onChange={(event) => setForm({ ...form, close_time: event.target.value })}
+              className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
+                fieldErrors.close_time
+                  ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
+                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+              }`}
+            />
+            {fieldErrors.close_time && (
+              <p className="mt-1 text-sm text-red-600">{fieldErrors.close_time}</p>
+            )}
           </div>
         </div>
 

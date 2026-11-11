@@ -7,9 +7,9 @@ const asyncHandler = require('../utils/asyncHandler')
 const { UPLOADS_DIR } = require('../middleware/uploadMiddleware')
 
 // The only status values a facility may have
-const ALLOWED_STATUSES = ['available', 'unavailable']
+const ALLOWED_STATUSES = ['available', 'unavailable', 'maintenance']
 
-// SELECT used for lists and details: joins the owner (users)
+// SELECT used for lists and details: joins the creator (users)
 // and the category so pages can show their names.
 const FACILITY_SELECT = `
     SELECT
@@ -22,12 +22,18 @@ const FACILITY_SELECT = `
         c.name AS category_name,
         f.user_id,
         u.full_name AS owner_name,
+        f.price_per_hour,
+        f.capacity,
+        f.open_time,
+        f.close_time,
         f.created_at,
         f.updated_at
     FROM facilities f
     JOIN categories c ON f.category_id = c.id
     JOIN users u ON f.user_id = u.id
 `
+
+const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/
 
 // Removes an image multer already saved when the request turns out
 // to be invalid (e.g. a bad category id), so no orphan files remain.
@@ -37,12 +43,20 @@ const removeUploadedImage = (file) => {
     }
 }
 
+// Normalises "HH:MM" to "HH:MM:SS" for MySQL TIME columns
+const normalizeTime = (value) => {
+    const time = String(value).trim()
+    return time.length === 5 ? `${time}:00` : time
+}
+
 // Validates the facility fields coming from the client.
 // Returns { values } on success or { error } with a readable message.
-const validateFacility = ({ title, description, category_id, status }) => {
+const validateFacility = ({
+    title, description, category_id, status,
+    price_per_hour, capacity, open_time, close_time
+}) => {
     const cleanTitle = typeof title === 'string' ? title.trim() : ''
     const cleanDescription = typeof description === 'string' ? description.trim() : ''
-    const cleanCategoryId = Number.parseInt(category_id, 10)
 
     if (!cleanTitle) {
         return { error: 'Title is required' }
@@ -56,6 +70,8 @@ const validateFacility = ({ title, description, category_id, status }) => {
         return { error: 'Description is required' }
     }
 
+    const cleanCategoryId = Number.parseInt(category_id, 10)
+
     if (!Number.isInteger(cleanCategoryId) || cleanCategoryId < 1) {
         return { error: 'Please choose a valid category' }
     }
@@ -67,7 +83,53 @@ const validateFacility = ({ title, description, category_id, status }) => {
     }
 
     if (!ALLOWED_STATUSES.includes(cleanStatus)) {
-        return { error: 'Status must be either "available" or "unavailable"' }
+        return {
+            error: 'Status must be "available", "unavailable" or "maintenance"'
+        }
+    }
+
+    // Hourly price used for booking totals (Phase 2)
+    const cleanPrice = Number(price_per_hour)
+
+    if (price_per_hour === undefined || price_per_hour === null || price_per_hour === ''
+        || !Number.isFinite(cleanPrice)) {
+        return { error: 'Please enter a valid price per hour' }
+    }
+
+    if (cleanPrice < 0 || cleanPrice > 99999.99) {
+        return { error: 'Price per hour must be between 0 and 99999.99' }
+    }
+
+    // Optional capacity
+    let cleanCapacity = null
+
+    if (capacity !== undefined && capacity !== null && capacity !== '') {
+        const parsedCapacity = Number.parseInt(capacity, 10)
+
+        if (!Number.isInteger(parsedCapacity) || parsedCapacity < 1 || parsedCapacity > 100000) {
+            return { error: 'Capacity must be a whole number of at least 1' }
+        }
+
+        cleanCapacity = parsedCapacity
+    }
+
+    // Bookable hours — default to 08:00–22:00
+    let cleanOpenTime = open_time === undefined || open_time === null || open_time === ''
+        ? '08:00'
+        : open_time
+    let cleanCloseTime = close_time === undefined || close_time === null || close_time === ''
+        ? '22:00'
+        : close_time
+
+    if (!TIME_PATTERN.test(String(cleanOpenTime)) || !TIME_PATTERN.test(String(cleanCloseTime))) {
+        return { error: 'Opening and closing times must be valid times (HH:MM)' }
+    }
+
+    cleanOpenTime = normalizeTime(cleanOpenTime)
+    cleanCloseTime = normalizeTime(cleanCloseTime)
+
+    if (cleanCloseTime <= cleanOpenTime) {
+        return { error: 'Closing time must be after opening time' }
     }
 
     return {
@@ -75,7 +137,11 @@ const validateFacility = ({ title, description, category_id, status }) => {
             title: cleanTitle,
             description: cleanDescription,
             category_id: cleanCategoryId,
-            status: cleanStatus
+            status: cleanStatus,
+            price_per_hour: cleanPrice.toFixed(2),
+            capacity: cleanCapacity,
+            open_time: cleanOpenTime,
+            close_time: cleanCloseTime
         }
     }
 }
@@ -171,7 +237,7 @@ exports.getFacilityById = asyncHandler(async (req, res) => {
     })
 })
 
-// POST /api/facilities  (logged in, multipart form with optional image)
+// POST /api/facilities  (admin/manager, multipart form with optional image)
 exports.createFacility = asyncHandler(async (req, res) => {
     const validation = validateFacility(req.body)
 
@@ -193,14 +259,20 @@ exports.createFacility = asyncHandler(async (req, res) => {
     const image = req.file ? req.file.filename : null
 
     const [result] = await db.query(
-        `INSERT INTO facilities (user_id, category_id, title, description, status, image)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO facilities
+            (user_id, category_id, title, description, status,
+             price_per_hour, capacity, open_time, close_time, image)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             req.user.id,
             validation.values.category_id,
             validation.values.title,
             validation.values.description,
             validation.values.status,
+            validation.values.price_per_hour,
+            validation.values.capacity,
+            validation.values.open_time,
+            validation.values.close_time,
             image
         ]
     )
@@ -217,7 +289,9 @@ exports.createFacility = asyncHandler(async (req, res) => {
     })
 })
 
-// PUT /api/facilities/:id  (owner only, optional new image)
+// PUT /api/facilities/:id  (admin/manager, optional new image)
+// Access is enforced by role on the route (authorize middleware):
+// only admins and managers manage the center's facilities.
 exports.updateFacility = asyncHandler(async (req, res) => {
     const id = Number.parseInt(req.params.id, 10)
 
@@ -242,14 +316,6 @@ exports.updateFacility = asyncHandler(async (req, res) => {
 
     const existing = existingRows[0]
 
-    // Server-side ownership check — hiding the buttons is not enough
-    if (existing.user_id !== req.user.id) {
-        removeUploadedImage(req.file)
-        return res.status(403).json({
-            message: 'You can only edit or delete your own facilities'
-        })
-    }
-
     const validation = validateFacility(req.body)
 
     if (validation.error) {
@@ -271,13 +337,19 @@ exports.updateFacility = asyncHandler(async (req, res) => {
 
     await db.query(
         `UPDATE facilities
-         SET title = ?, description = ?, category_id = ?, status = ?, image = ?
+         SET title = ?, description = ?, category_id = ?, status = ?,
+             price_per_hour = ?, capacity = ?, open_time = ?, close_time = ?,
+             image = ?
          WHERE id = ?`,
         [
             validation.values.title,
             validation.values.description,
             validation.values.category_id,
             validation.values.status,
+            validation.values.price_per_hour,
+            validation.values.capacity,
+            validation.values.open_time,
+            validation.values.close_time,
             image,
             id
         ]
@@ -300,7 +372,7 @@ exports.updateFacility = asyncHandler(async (req, res) => {
     })
 })
 
-// DELETE /api/facilities/:id  (owner only)
+// DELETE /api/facilities/:id  (admin/manager)
 exports.deleteFacility = asyncHandler(async (req, res) => {
     const id = Number.parseInt(req.params.id, 10)
 
@@ -322,13 +394,6 @@ exports.deleteFacility = asyncHandler(async (req, res) => {
     }
 
     const existing = existingRows[0]
-
-    // Server-side ownership check
-    if (existing.user_id !== req.user.id) {
-        return res.status(403).json({
-            message: 'You can only edit or delete your own facilities'
-        })
-    }
 
     await db.query(
         'DELETE FROM facilities WHERE id = ?',
