@@ -47,7 +47,7 @@ export default function CalendarPage() {
           <select
             value={facilityId}
             onChange={(event) => setFacilityId(event.target.value)}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           >
             <option value="">All facilities</option>
             {facilities.map((facility) => (
@@ -160,10 +160,10 @@ function WeekGrid({ facilityId, weekStart, days }) {
             <div
               key={day}
               className={`rounded-xl border bg-white shadow-sm ${
-                isToday ? 'border-emerald-400' : 'border-slate-200'
+                isToday ? 'border-blue-400' : 'border-slate-200'
               }`}
             >
-              <div className={`border-b p-2 text-center ${isToday ? 'bg-emerald-50' : ''}`}>
+              <div className={`border-b p-2 text-center ${isToday ? 'bg-blue-50' : ''}`}>
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   {date.toLocaleDateString('en-GB', { weekday: 'short' })}
                 </p>
@@ -183,7 +183,7 @@ function WeekGrid({ facilityId, weekStart, days }) {
                       className={`block rounded-md border p-2 text-xs transition hover:shadow ${
                         reservation.status === 'cancelled'
                           ? 'border-slate-200 bg-slate-50 opacity-60'
-                          : 'border-slate-200 bg-white hover:border-emerald-300'
+                          : 'border-slate-200 bg-white hover:border-blue-300'
                       }`}
                     >
                       <p className="font-semibold text-slate-800">

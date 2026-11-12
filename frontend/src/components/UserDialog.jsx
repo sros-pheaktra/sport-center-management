@@ -101,7 +101,7 @@ export default function UserDialog({ user, onClose, onSaved }) {
     `mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
       fieldErrors[field]
         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-        : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+        : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
     }`
 
   return (
@@ -187,7 +187,7 @@ export default function UserDialog({ user, onClose, onSaved }) {
               value={form.role}
               disabled={isEdit ? !adminEditor : currentUser.role === 'manager'}
               onChange={(event) => setForm({ ...form, role: event.target.value })}
-              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100 disabled:text-slate-500"
+              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100 disabled:text-slate-500"
             >
               {(currentUser.role === 'manager'
                 ? [{ value: 'staff', label: 'Staff' }]
@@ -231,7 +231,7 @@ export default function UserDialog({ user, onClose, onSaved }) {
                 type="checkbox"
                 checked={form.is_active}
                 onChange={(event) => setForm({ ...form, is_active: event.target.checked })}
-                className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
               />
               Account is active (deactivated accounts cannot log in)
             </label>
@@ -248,7 +248,7 @@ export default function UserDialog({ user, onClose, onSaved }) {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
             >
               {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Create account'}
             </button>

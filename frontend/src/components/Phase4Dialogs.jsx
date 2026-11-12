@@ -4,7 +4,7 @@ import { formatPrice } from '../utils/format'
 import { todayInputValue, shiftDateInput } from '../utils/reservation'
 
 const inputClass =
-  'mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200'
+  'mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200'
 
 const overlayClass =
   'fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4'
@@ -195,7 +195,7 @@ export function EquipmentDialog({ item, onClose, onSaved }) {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
           >
             {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add item'}
           </button>
@@ -327,7 +327,7 @@ export function RentEquipmentDialog({ item, onClose, onRented }) {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
           >
             {saving ? 'Renting…' : 'Confirm rental'}
           </button>
@@ -576,7 +576,7 @@ export function PromotionDialog({ promotion, onClose, onSaved }) {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
           >
             {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Create code'}
           </button>

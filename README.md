@@ -18,7 +18,7 @@ The project grows in five phases (see [`ROADMAP.md`](ROADMAP.md)):
 | **1. Core foundation** | roles + RBAC, admin dashboard, user/staff management, facility & category CRUD | ✅ implemented |
 | **2. Booking system** | availability, calendar, reservations, cancellation, online/at-center payment, check-in/completion | ✅ implemented |
 | **3. Business operations** | invoices, membership plans, staff schedules/attendance, maintenance | ✅ implemented |
-| **4. Advanced features** | QR check-in, notifications, equipment rental, promotions, reviews | planned |
+| **4. Advanced features** | QR check-in, notifications, equipment rental, promotions, reviews | implemented |
 | **5. Analytics** | revenue, facility utilization, customer and staff performance reports | planned |
 
 ---
@@ -45,6 +45,26 @@ The project grows in five phases (see [`ROADMAP.md`](ROADMAP.md)):
 
 Role checks are enforced **on the server** with `authenticate` +
 `authorize(...roles)` middleware; the frontend only decides what to show.
+
+## Interface
+
+The frontend uses a responsive admin shell shared by every page:
+
+- a dark, collapsible left sidebar with role-aware navigation groups
+  (Overview, Management, Finance & Services, Administration), Lucide icons,
+  active-route highlighting and icon tooltips when collapsed;
+- a sticky top header with breadcrumb + page title, global search, notification
+  bell, user menu (Profile, Settings, Logout) and a contextual primary action;
+- a mobile slide-out drawer with an overlay and scroll lock;
+- a dashboard overview with KPI cards, an SVG revenue chart (daily / weekly /
+  monthly), booking trend and status charts, today's bookings, facility
+  availability, quick actions and a merged activity feed.
+
+The dashboard is backed by `GET /api/dashboard/stats`, which returns the KPI
+totals, comparison trends, chart series, today's schedule and recent activity in
+one request. Charts are small hand-built SVG/CSS components, so no chart
+dependency is added. Authentication pages use the same branding without the
+sidebar or header.
 
 ## Reservation lifecycle
 

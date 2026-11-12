@@ -58,7 +58,7 @@ export default function AttendancePage() {
               type="date"
               value={date}
               onChange={(event) => setDate(event.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
           </label>
         </div>
@@ -147,7 +147,7 @@ function AttendanceCard({ onChanged }) {
               type="button"
               disabled={busy !== ''}
               onClick={() => runAction('clock-in')}
-              className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+              className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
             >
               {busy === 'clock-in' ? 'Clocking in…' : 'Clock in'}
             </button>

@@ -155,7 +155,7 @@ export default function NotificationsPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <NotificationTypeBadge type={notification.type} />
                     {!notification.is_read && (
-                      <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                      <span className="rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                         New
                       </span>
                     )}
@@ -171,7 +171,7 @@ export default function NotificationsPage() {
                   {notification.link && (
                     <Link
                       to={notification.link}
-                      className="text-sm font-medium text-emerald-700 hover:underline"
+                      className="text-sm font-medium text-blue-700 hover:underline"
                     >
                       Open →
                     </Link>

@@ -55,7 +55,7 @@ export default function FacilitiesPage() {
         {canManageContent(user) && (
           <Link
             to="/facilities/new"
-            className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+            className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
           >
             + Add a facility
           </Link>
@@ -74,7 +74,7 @@ export default function FacilitiesPage() {
             onChange={(event) => setSearchInput(event.target.value)}
             placeholder="Search by keyword…"
             aria-label="Search facilities by keyword"
-            className="w-full rounded-md border border-slate-300 py-2 pl-9 pr-3 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="w-full rounded-md border border-slate-300 py-2 pl-9 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
         </div>
 
@@ -82,7 +82,7 @@ export default function FacilitiesPage() {
           value={categoryId}
           onChange={(event) => setCategoryId(event.target.value)}
           aria-label="Filter by category"
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
         >
           <option value="">All categories</option>
           {categories.map((category) => (
@@ -96,7 +96,7 @@ export default function FacilitiesPage() {
           value={status}
           onChange={(event) => setStatus(event.target.value)}
           aria-label="Filter by status"
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
         >
           <option value="">Any status</option>
           <option value="available">Available</option>
@@ -195,7 +195,7 @@ function FacilityResults({ search, categoryId, status, hasFilters, onClearFilter
           {canManageContent(user) && (
             <Link
               to="/facilities/new"
-              className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
             >
               + Add a facility
             </Link>

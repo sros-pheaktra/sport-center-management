@@ -213,7 +213,7 @@ function FacilityForm({ mode, id }) {
         </p>
         <Link
           to="/"
-          className="mt-6 inline-block rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+          className="mt-6 inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
           ← Back to all facilities
         </Link>
@@ -257,7 +257,7 @@ function FacilityForm({ mode, id }) {
             className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               fieldErrors.title
                 ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+                : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
             }`}
           />
           {fieldErrors.title && (
@@ -278,7 +278,7 @@ function FacilityForm({ mode, id }) {
             className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
               fieldErrors.description
                 ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+                : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
             }`}
           />
           {fieldErrors.description && (
@@ -298,7 +298,7 @@ function FacilityForm({ mode, id }) {
               className={`mt-1 w-full rounded-md border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
                 fieldErrors.category_id
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+                  : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
               }`}
             >
               <option value="">Choose a category…</option>
@@ -321,7 +321,7 @@ function FacilityForm({ mode, id }) {
               id="status"
               value={form.status}
               onChange={(event) => setForm({ ...form, status: event.target.value })}
-              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             >
               <option value="available">Available</option>
               <option value="unavailable">Unavailable</option>
@@ -350,7 +350,7 @@ function FacilityForm({ mode, id }) {
               className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
                 fieldErrors.price_per_hour
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+                  : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
               }`}
             />
             {fieldErrors.price_per_hour && (
@@ -373,7 +373,7 @@ function FacilityForm({ mode, id }) {
               className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
                 fieldErrors.capacity
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+                  : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
               }`}
             />
             {fieldErrors.capacity && (
@@ -392,7 +392,7 @@ function FacilityForm({ mode, id }) {
               type="time"
               value={form.open_time}
               onChange={(event) => setForm({ ...form, open_time: event.target.value })}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
           </div>
           <div>
@@ -407,7 +407,7 @@ function FacilityForm({ mode, id }) {
               className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
                 fieldErrors.close_time
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+                  : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
               }`}
             />
             {fieldErrors.close_time && (
@@ -425,7 +425,7 @@ function FacilityForm({ mode, id }) {
             type="file"
             accept="image/jpeg, image/png"
             onChange={handleImageChange}
-            className="mt-1 w-full cursor-pointer rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-emerald-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-emerald-700 hover:file:bg-emerald-100"
+            className="mt-1 w-full cursor-pointer rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-blue-50 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-blue-700 hover:file:bg-blue-100"
           />
           {fieldErrors.image && (
             <p className="mt-1 text-sm text-red-600">{fieldErrors.image}</p>
@@ -464,7 +464,7 @@ function FacilityForm({ mode, id }) {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
           >
             {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Create facility'}
           </button>

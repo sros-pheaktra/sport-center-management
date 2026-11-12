@@ -97,7 +97,7 @@ export default function PromotionsPage() {
         <button
           type="button"
           onClick={() => setDialog('new')}
-          className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+          className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
         >
           + New code
         </button>

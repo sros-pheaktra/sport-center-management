@@ -45,7 +45,7 @@ function BookingFlow({ facilityId }) {
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <h1 className="text-xl font-semibold text-slate-800">Facility not found</h1>
         <p className="mt-2 text-slate-600">This facility may have been deleted.</p>
-        <Link to="/" className="mt-6 inline-block text-sm font-medium text-emerald-700 hover:underline">
+        <Link to="/" className="mt-6 inline-block text-sm font-medium text-blue-700 hover:underline">
           ← Back to all facilities
         </Link>
       </div>
@@ -64,7 +64,7 @@ function BookingFlow({ facilityId }) {
     <div className="mx-auto max-w-5xl px-4 py-8">
       <Link
         to={`/facilities/${facility.id}`}
-        className="text-sm font-medium text-emerald-700 hover:underline"
+        className="text-sm font-medium text-blue-700 hover:underline"
       >
         ← Back to {facility.title}
       </Link>
@@ -85,7 +85,7 @@ function BookingFlow({ facilityId }) {
             value={date}
             min={todayInputValue()}
             onChange={(event) => setDate(event.target.value)}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
         </label>
       </div>
@@ -269,14 +269,14 @@ function SlotPicker({ facility, date }) {
                   onClick={() => chooseStart(slot.start)}
                   className={`rounded-md border px-2 py-2 text-center text-sm transition ${
                     isSelected
-                      ? 'border-emerald-600 bg-emerald-600 text-white'
+                      ? 'border-blue-600 bg-blue-600 text-white'
                       : disabled
                         ? 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
-                        : 'border-slate-300 bg-white text-slate-700 hover:border-emerald-400 hover:bg-emerald-50'
+                        : 'border-slate-300 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50'
                   }`}
                 >
                   <span className="block font-semibold">{slot.start}</span>
-                  <span className={`block text-xs ${isSelected ? 'text-emerald-100' : 'text-slate-400'}`}>
+                  <span className={`block text-xs ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
                     to {slot.end}
                   </span>
                   {disabled && (
@@ -306,7 +306,7 @@ function SlotPicker({ facility, date }) {
               value={safeHours}
               onChange={(event) => setHours(Number(event.target.value))}
               disabled={!selected}
-              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 disabled:bg-slate-100"
             >
               {Array.from({ length: maxHours }, (_, index) => index + 1).map((value) => (
                 <option key={value} value={value}>
@@ -333,7 +333,7 @@ function SlotPicker({ facility, date }) {
               rows={3}
               maxLength={500}
               placeholder="Anything the staff should know?"
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
             />
           </div>
 
@@ -413,7 +413,7 @@ function SlotPicker({ facility, date }) {
           <button
             type="submit"
             disabled={submitting || !selected || facility.status !== 'available'}
-            className="w-full rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting
               ? 'Creating booking…'

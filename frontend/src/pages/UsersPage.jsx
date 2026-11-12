@@ -114,7 +114,7 @@ export default function UsersPage() {
         <button
           type="button"
           onClick={openCreate}
-          className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+          className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
         >
           + New account
         </button>
@@ -128,13 +128,13 @@ export default function UsersPage() {
           onChange={(event) => setSearchInput(event.target.value)}
           placeholder="Search by name or email…"
           aria-label="Search accounts"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
         />
         <select
           value={role}
           onChange={(event) => setRole(event.target.value)}
           aria-label="Filter by role"
-          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+          className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
         >
           {roleFilterOptions.map((option) => (
             <option key={option.value} value={option.value}>

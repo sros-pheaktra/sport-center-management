@@ -151,7 +151,7 @@ export default function EquipmentPage() {
           <button
             type="button"
             onClick={() => setDialogItem('new')}
-            className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+            className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
           >
             + New item
           </button>
@@ -169,7 +169,7 @@ export default function EquipmentPage() {
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Racket, football, bibs…"
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
         </div>
         <div>
@@ -180,7 +180,7 @@ export default function EquipmentPage() {
             id="equipment-status-filter"
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           >
             <option value="">All statuses</option>
             <option value="available">Available</option>
@@ -230,7 +230,7 @@ export default function EquipmentPage() {
                   <button
                     type="button"
                     onClick={() => setRentItem(item)}
-                    className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                   >
                     Rent this item
                   </button>
@@ -246,7 +246,7 @@ export default function EquipmentPage() {
                   <Link
                     to="/login"
                     state={{ from: '/equipment' }}
-                    className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                   >
                     Log in to rent
                   </Link>

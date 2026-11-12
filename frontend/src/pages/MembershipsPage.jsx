@@ -141,7 +141,7 @@ export default function MembershipsPage() {
           <button
             type="button"
             onClick={() => setPlanDialog('new')}
-            className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+            className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
           >
             + New plan
           </button>
@@ -234,7 +234,7 @@ function CurrentMembership({ membership }) {
             {Number(membership.booking_discount_percent)}% off every new booking
           </p>
         </div>
-        <span className="rounded-full bg-emerald-600 px-3 py-1 text-sm font-semibold text-white">
+        <span className="rounded-full bg-blue-600 px-3 py-1 text-sm font-semibold text-white">
           Active
         </span>
       </div>
@@ -271,7 +271,7 @@ function CustomerPlans({ plans, hasActive, subscribingId, onSubscribe, membershi
               type="button"
               disabled={hasActive || subscribingId === plan.id}
               onClick={() => onSubscribe(plan)}
-              className="mt-4 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="mt-4 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {subscribingId === plan.id
                 ? 'Subscribing…'

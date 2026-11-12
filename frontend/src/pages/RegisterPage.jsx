@@ -55,7 +55,7 @@ export default function RegisterPage() {
     `mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
       fieldErrors[field]
         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-        : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+        : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
     }`
 
   return (
@@ -165,7 +165,7 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
           >
             {busy ? 'Creating account…' : 'Create account'}
           </button>
@@ -173,7 +173,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-slate-600">
           Already have an account?{' '}
-          <Link to="/login" className="font-medium text-emerald-700 hover:underline">
+          <Link to="/login" className="font-medium text-blue-700 hover:underline">
             Log in
           </Link>
         </p>

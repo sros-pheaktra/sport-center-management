@@ -32,7 +32,7 @@ export default function ProfilePage() {
     `mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
       invalid
         ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-        : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+        : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
     }`
 
   const handleProfileSubmit = async (event) => {
@@ -161,7 +161,7 @@ export default function ProfilePage() {
         <button
           type="submit"
           disabled={savingProfile}
-          className="mt-5 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="mt-5 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
         >
           {savingProfile ? 'Saving…' : 'Save changes'}
         </button>
@@ -244,7 +244,7 @@ export default function ProfilePage() {
         <button
           type="submit"
           disabled={savingPassword}
-          className="mt-5 rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="mt-5 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
         >
           {savingPassword ? 'Changing…' : 'Change password'}
         </button>

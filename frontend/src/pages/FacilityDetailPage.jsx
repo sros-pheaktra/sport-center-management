@@ -78,7 +78,7 @@ function FacilityDetail({ id }) {
         </p>
         <Link
           to="/"
-          className="mt-6 inline-block rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+          className="mt-6 inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
           ← Back to all facilities
         </Link>
@@ -98,7 +98,7 @@ function FacilityDetail({ id }) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <Link to="/" className="text-sm font-medium text-emerald-700 hover:underline">
+      <Link to="/" className="text-sm font-medium text-blue-700 hover:underline">
         ← Back to all facilities
       </Link>
 
@@ -160,7 +160,7 @@ function FacilityDetail({ id }) {
                   user ? (
                     <Link
                       to={`/facilities/${facility.id}/book`}
-                      className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                      className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                     >
                       Choose a time →
                     </Link>
@@ -168,7 +168,7 @@ function FacilityDetail({ id }) {
                     <Link
                       to="/login"
                       state={{ from: `/facilities/${facility.id}/book` }}
-                      className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                      className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
                     >
                       Log in to book
                     </Link>

@@ -54,7 +54,7 @@ function Invoice({ invoiceId }) {
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <h1 className="text-xl font-semibold text-slate-800">Invoice not found</h1>
         <p className="mt-2 text-slate-600">It may have been removed with its booking.</p>
-        <Link to="/bookings" className="mt-6 inline-block text-sm font-medium text-emerald-700 hover:underline">
+        <Link to="/bookings" className="mt-6 inline-block text-sm font-medium text-blue-700 hover:underline">
           ← Back to bookings
         </Link>
       </div>
@@ -65,7 +65,7 @@ function Invoice({ invoiceId }) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <p className="text-red-700">{loadError}</p>
-        <Link to="/bookings" className="mt-6 inline-block text-sm font-medium text-emerald-700 hover:underline">
+        <Link to="/bookings" className="mt-6 inline-block text-sm font-medium text-blue-700 hover:underline">
           ← Back to bookings
         </Link>
       </div>
@@ -80,7 +80,7 @@ function Invoice({ invoiceId }) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <Link
           to={`/bookings/${invoice.reference}`}
-          className="text-sm font-medium text-emerald-700 hover:underline"
+          className="text-sm font-medium text-blue-700 hover:underline"
         >
           ← Back to booking {invoice.reference}
         </Link>
@@ -96,7 +96,7 @@ function Invoice({ invoiceId }) {
       <article className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm print:border-0 print:p-0 print:shadow-none">
         <header className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-6">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">
               Sport Center
             </p>
             <h1 className="mt-1 text-3xl font-bold text-slate-900">Invoice</h1>

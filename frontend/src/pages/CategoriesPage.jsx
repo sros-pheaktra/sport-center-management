@@ -136,14 +136,14 @@ export default function CategoriesPage() {
             value={newName}
             onChange={(event) => setNewName(event.target.value)}
             placeholder="e.g. Cricket"
-            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
           {formError && <p className="mt-1 text-sm text-red-600">{formError}</p>}
         </div>
         <button
           type="submit"
           disabled={creating}
-          className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
         >
           {creating ? 'Adding…' : '+ Add category'}
         </button>
@@ -185,7 +185,7 @@ export default function CategoriesPage() {
                         value={editName}
                         onChange={(event) => setEditName(event.target.value)}
                         aria-label="Category name"
-                        className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                        className="w-full rounded-md border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       />
                     ) : (
                       <span className="font-medium text-slate-900">{category.name}</span>
@@ -202,7 +202,7 @@ export default function CategoriesPage() {
                             type="button"
                             onClick={handleSaveEdit}
                             disabled={savingEdit}
-                            className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                            className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
                           >
                             {savingEdit ? 'Saving…' : 'Save'}
                           </button>

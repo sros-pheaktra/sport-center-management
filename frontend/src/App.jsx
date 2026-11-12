@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthProvider'
 import { ToastProvider } from './context/ToastProvider'
-import Navbar from './components/Navbar'
+import AppLayout from './components/layout/AppLayout'
 import { RequireAuth, RoleGuard } from './components/Guards'
 import FacilitiesPage from './pages/FacilitiesPage'
 import FacilityDetailPage from './pages/FacilityDetailPage'
@@ -26,6 +26,7 @@ import NotificationsPage from './pages/NotificationsPage'
 import EquipmentPage from './pages/EquipmentPage'
 import PromotionsPage from './pages/PromotionsPage'
 import CheckInPage from './pages/CheckInPage'
+import SettingsPage from './pages/SettingsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
@@ -33,12 +34,9 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
-          <div className="flex min-h-screen flex-col bg-slate-50">
-            <Navbar />
-
-            <main className="flex-1">
-              <Routes>
-                {/* Public */}
+          <AppLayout>
+            <Routes>
+              {/* Public */}
                 <Route path="/" element={<FacilitiesPage />} />
                 <Route path="/facilities/:id" element={<FacilityDetailPage />} />
                 <Route path="/login" element={<LoginPage />} />
@@ -208,15 +206,18 @@ export default function App() {
                     </RequireAuth>
                   }
                 />
+                <Route
+                  path="/settings"
+                  element={
+                    <RequireAuth>
+                      <SettingsPage />
+                    </RequireAuth>
+                  }
+                />
 
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
-            </main>
-
-            <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-400">
-              Sport Center Management — full-stack coursework project
-            </footer>
-          </div>
+          </AppLayout>
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>

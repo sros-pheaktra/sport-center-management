@@ -17,7 +17,7 @@ export default function FacilityCard({ facility }) {
 
       <div className="flex flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-slate-900 group-hover:text-emerald-700">
+          <h3 className="font-semibold text-slate-900 group-hover:text-blue-700">
             {facility.title}
           </h3>
           <StatusBadge status={facility.status} />

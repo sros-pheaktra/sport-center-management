@@ -80,7 +80,7 @@ function BookingDetail({ reference }) {
         <p className="mt-2 text-slate-600">
           Check the reference in your confirmation email or open it from your bookings list.
         </p>
-        <Link to="/bookings" className="mt-6 inline-block text-sm font-medium text-emerald-700 hover:underline">
+        <Link to="/bookings" className="mt-6 inline-block text-sm font-medium text-blue-700 hover:underline">
           ← Back to bookings
         </Link>
       </div>
@@ -91,7 +91,7 @@ function BookingDetail({ reference }) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <p className="text-red-700">{loadError}</p>
-        <Link to="/bookings" className="mt-6 inline-block text-sm font-medium text-emerald-700 hover:underline">
+        <Link to="/bookings" className="mt-6 inline-block text-sm font-medium text-blue-700 hover:underline">
           ← Back to bookings
         </Link>
       </div>
@@ -115,7 +115,7 @@ function BookingDetail({ reference }) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <Link to="/bookings" className="text-sm font-medium text-emerald-700 hover:underline">
+      <Link to="/bookings" className="text-sm font-medium text-blue-700 hover:underline">
         ← Back to bookings
       </Link>
 
@@ -138,7 +138,7 @@ function BookingDetail({ reference }) {
               <p>
                 <Link
                   to={`/facilities/${reservation.facility_id}`}
-                  className="text-lg font-semibold text-slate-900 hover:text-emerald-700"
+                  className="text-lg font-semibold text-slate-900 hover:text-blue-700"
                 >
                   {reservation.facility_title}
                 </Link>
@@ -189,7 +189,7 @@ function BookingDetail({ reference }) {
                   <dd className="flex flex-wrap items-center justify-end gap-2">
                     <Link
                       to={`/invoices/${reservation.invoice_id}`}
-                      className="font-mono text-xs font-medium text-emerald-700 hover:underline"
+                      className="font-mono text-xs font-medium text-blue-700 hover:underline"
                     >
                       {reservation.invoice_number}
                     </Link>
@@ -255,7 +255,7 @@ function BookingDetail({ reference }) {
                 type="button"
                 disabled={busyAction !== ''}
                 onClick={() => runAction('pay', `/reservations/${reservation.id}/pay`, undefined, 'Payment successful')}
-                className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
               >
                 {busyAction === 'pay' ? 'Processing…' : `Pay ${formatPrice(reservation.total_price)} online`}
               </button>
@@ -266,7 +266,7 @@ function BookingDetail({ reference }) {
                 type="button"
                 disabled={busyAction !== ''}
                 onClick={() => runAction('confirm', `/reservations/${reservation.id}/confirm`, undefined, 'Booking confirmed')}
-                className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
               >
                 {busyAction === 'confirm' ? 'Confirming…' : 'Confirm booking'}
               </button>

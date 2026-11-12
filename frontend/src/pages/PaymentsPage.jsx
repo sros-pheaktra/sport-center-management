@@ -86,7 +86,7 @@ export default function PaymentsPage() {
             id="payment-status-filter"
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           >
             <option value="">Any status</option>
             <option value="pending">Pending</option>
@@ -104,7 +104,7 @@ export default function PaymentsPage() {
             id="payment-method-filter"
             value={method}
             onChange={(event) => setMethod(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           >
             <option value="">Any method</option>
             <option value="online">Online</option>
@@ -121,7 +121,7 @@ export default function PaymentsPage() {
             type="date"
             value={date}
             onChange={(event) => setDate(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           />
         </div>
 
@@ -269,7 +269,7 @@ function PaymentResults({
                 <td className="px-4 py-3">
                   <Link
                     to={`/bookings/${payment.reference}`}
-                    className="font-mono text-xs font-semibold text-emerald-700 hover:underline"
+                    className="font-mono text-xs font-semibold text-blue-700 hover:underline"
                   >
                     {payment.reference}
                   </Link>
@@ -299,7 +299,7 @@ function PaymentResults({
                     <div className="space-y-1">
                       <Link
                         to={`/invoices/${payment.invoice_id}`}
-                        className="font-mono text-xs font-medium text-emerald-700 hover:underline"
+                        className="font-mono text-xs font-medium text-blue-700 hover:underline"
                       >
                         {payment.invoice_number}
                       </Link>
@@ -316,7 +316,7 @@ function PaymentResults({
                         type="button"
                         disabled={busyId === payment.id}
                         onClick={() => onRecord(payment)}
-                        className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+                        className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
                       >
                         {busyId === payment.id ? 'Recording…' : 'Record payment'}
                       </button>

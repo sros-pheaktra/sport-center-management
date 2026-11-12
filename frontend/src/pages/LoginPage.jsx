@@ -78,7 +78,7 @@ export default function LoginPage() {
               className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
                 fieldErrors.email
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+                  : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
               }`}
             />
             {fieldErrors.email && (
@@ -99,7 +99,7 @@ export default function LoginPage() {
               className={`mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${
                 fieldErrors.password
                   ? 'border-red-300 focus:border-red-500 focus:ring-red-100'
-                  : 'border-slate-300 focus:border-emerald-500 focus:ring-emerald-200'
+                  : 'border-slate-300 focus:border-blue-500 focus:ring-blue-200'
               }`}
             />
             {fieldErrors.password && (
@@ -110,7 +110,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+            className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
           >
             {busy ? 'Logging in…' : 'Log in'}
           </button>
@@ -118,7 +118,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-slate-600">
           No account yet?{' '}
-          <Link to="/register" className="font-medium text-emerald-700 hover:underline">
+          <Link to="/register" className="font-medium text-blue-700 hover:underline">
             Register here
           </Link>
         </p>

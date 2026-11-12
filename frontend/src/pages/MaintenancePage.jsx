@@ -74,7 +74,7 @@ export default function MaintenancePage() {
         <button
           type="button"
           onClick={() => setShowRequest(true)}
-          className="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+          className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
         >
           + Report issue
         </button>
@@ -89,7 +89,7 @@ export default function MaintenancePage() {
             id="maintenance-status-filter"
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           >
             <option value="">Any status</option>
             <option value="open">Open</option>
@@ -107,7 +107,7 @@ export default function MaintenancePage() {
             id="maintenance-priority-filter"
             value={priority}
             onChange={(event) => setPriority(event.target.value)}
-            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
           >
             <option value="">Any priority</option>
             <option value="high">High</option>
@@ -275,7 +275,7 @@ function RequestList({
                     <button
                       type="button"
                       onClick={() => onResolve(request)}
-                      className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
+                      className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
                     >
                       Resolve / close
                     </button>
@@ -353,7 +353,7 @@ function MaintenanceRequestDialog({ facilities, onClose, onSaved }) {
   }
 
   const inputClass =
-    'mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200'
+    'mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200'
 
   return (
     <div
@@ -457,7 +457,7 @@ function MaintenanceRequestDialog({ facilities, onClose, onSaved }) {
             <button
               type="submit"
               disabled={saving || facilities.length === 0}
-              className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
             >
               {saving ? 'Filing…' : 'File request'}
             </button>
@@ -498,7 +498,7 @@ function ResolveDialog({ request, onClose, onSaved }) {
   }
 
   const inputClass =
-    'mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200'
+    'mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200'
 
   return (
     <div
@@ -568,7 +568,7 @@ function ResolveDialog({ request, onClose, onSaved }) {
             <button
               type="submit"
               disabled={saving}
-              className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save outcome'}
             </button>

@@ -10,7 +10,7 @@ export default function NotFoundPage() {
       <p className="mt-2 text-slate-600">The page you are looking for does not exist.</p>
       <Link
         to="/"
-        className="mt-6 inline-block rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+        className="mt-6 inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
       >
         ← Back to all facilities
       </Link>
