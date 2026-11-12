@@ -2,7 +2,8 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import RoleBadge from './RoleBadge'
-import { canManageContent, canManageUsers, isStaffSide } from '../utils/roles'
+import NotificationBell from './NotificationBell'
+import { canManageContent, canManagePlans, canManageUsers, isStaffSide } from '../utils/roles'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
@@ -26,22 +27,79 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
+      <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2">
         <Link to="/" className="flex items-center gap-2 font-bold text-slate-900">
           <img src="/favicon.svg" alt="" className="h-8 w-8" />
           <span className="text-lg">Sport Center</span>
         </Link>
 
-        <nav className="flex items-center gap-1 sm:gap-2">
+        <nav className="flex flex-wrap items-center gap-1 sm:gap-2">
           <NavLink to="/" className={linkClass}>
             Facilities
           </NavLink>
 
-          {/* Staff-side navigation grows in later phases (bookings,
-              schedules, maintenance, …) */}
+          <NavLink to="/equipment" className={linkClass}>
+            Equipment
+          </NavLink>
+
+          {user && (
+            <NavLink to="/bookings" className={linkClass}>
+              {isStaffSide(user) ? 'Bookings' : 'My bookings'}
+            </NavLink>
+          )}
+
+          {isStaffSide(user) && (
+            <NavLink to="/calendar" className={linkClass}>
+              Calendar
+            </NavLink>
+          )}
+
           {isStaffSide(user) && (
             <NavLink to="/dashboard" className={linkClass}>
               Dashboard
+            </NavLink>
+          )}
+
+          {/* Business operations (Phase 3) */}
+          {isStaffSide(user) && (
+            <NavLink to="/payments" className={linkClass}>
+              Payments
+            </NavLink>
+          )}
+
+          {isStaffSide(user) && (
+            <NavLink to="/schedules" className={linkClass}>
+              Schedules
+            </NavLink>
+          )}
+
+          {isStaffSide(user) && (
+            <NavLink to="/attendance" className={linkClass}>
+              Attendance
+            </NavLink>
+          )}
+
+          {isStaffSide(user) && (
+            <NavLink to="/maintenance" className={linkClass}>
+              Maintenance
+            </NavLink>
+          )}
+
+          {isStaffSide(user) && (
+            <NavLink to="/check-in" className={linkClass}>
+              Check-in
+            </NavLink>
+          )}
+
+          {canManageContent(user) && (
+            <NavLink to="/promotions" className={linkClass}>
+              Promotions
+            </NavLink>
+          )}
+
+          {user && (canManagePlans(user) || user.role === 'customer') && (
+            <NavLink to="/memberships" className={linkClass}>
+              Memberships
             </NavLink>
           )}
 

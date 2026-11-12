@@ -5,8 +5,13 @@ import { useAuth } from '../context/AuthContext'
 import Loading from '../components/Loading'
 import RoleBadge from '../components/RoleBadge'
 import StatusBadge from '../components/StatusBadge'
-import { formatDate } from '../utils/format'
-import { canManageContent, canManageUsers } from '../utils/roles'
+import { formatDate, formatPrice } from '../utils/format'
+import {
+  canManageContent,
+  canManagePlans,
+  canManageSchedules,
+  canManageUsers
+} from '../utils/roles'
 
 export default function DashboardPage() {
   const { user } = useAuth()
@@ -98,6 +103,15 @@ function StaffDashboard() {
 
         <div className="flex flex-wrap gap-2">
           {canManageUsers(user) && <QuickLink to="/users">Manage users</QuickLink>}
+          <QuickLink to="/bookings">View bookings</QuickLink>
+          <QuickLink to="/calendar">Booking calendar</QuickLink>
+          <QuickLink to="/payments">Payments</QuickLink>
+          <QuickLink to="/schedules">
+            {canManageSchedules(user) ? 'Staff schedules' : 'My schedule'}
+          </QuickLink>
+          <QuickLink to="/attendance">Attendance</QuickLink>
+          <QuickLink to="/maintenance">Maintenance</QuickLink>
+          {canManagePlans(user) && <QuickLink to="/memberships">Membership plans</QuickLink>}
           {canManageContent(user) && <QuickLink to="/facilities/new">+ Add facility</QuickLink>}
           <QuickLink to="/">Browse facilities</QuickLink>
         </div>
@@ -124,6 +138,16 @@ function StaffDashboard() {
           ]}
         />
         <StatCard title="Categories" value={stats.total_categories} />
+        <StatCard title="Today’s bookings" value={stats.today_bookings} />
+        <StatCard
+          title="Revenue this month"
+          value={formatPrice(stats.revenue_this_month)}
+          chips={[
+            { label: 'pending at-center payments', count: stats.pending_payments }
+          ]}
+        />
+        <StatCard title="Active memberships" value={stats.active_memberships} />
+        <StatCard title="Open maintenance" value={stats.open_maintenance} />
       </div>
 
       <div className="mt-8 grid gap-5 lg:grid-cols-2">
@@ -195,6 +219,8 @@ function CustomerDashboard({ name }) {
           >
             Browse facilities
           </Link>
+          <QuickLink to="/bookings">My bookings</QuickLink>
+          <QuickLink to="/memberships">My membership</QuickLink>
           <QuickLink to="/profile">My profile</QuickLink>
         </div>
       </div>

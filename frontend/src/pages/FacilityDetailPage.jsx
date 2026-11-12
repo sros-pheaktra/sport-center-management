@@ -146,6 +146,41 @@ function FacilityDetail({ id }) {
               </div>
             </dl>
 
+            {/* Primary customer action: start the booking flow */}
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="font-semibold text-emerald-900">Book this facility</p>
+                  <p className="text-sm text-emerald-800">
+                    {formatPrice(facility.price_per_hour)} per hour · {formatTime(facility.open_time)}–{formatTime(facility.close_time)}
+                  </p>
+                </div>
+
+                {facility.status === 'available' ? (
+                  user ? (
+                    <Link
+                      to={`/facilities/${facility.id}/book`}
+                      className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                    >
+                      Choose a time →
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/login"
+                      state={{ from: `/facilities/${facility.id}/book` }}
+                      className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+                    >
+                      Log in to book
+                    </Link>
+                  )
+                ) : (
+                  <span className="rounded-md bg-slate-200 px-4 py-2 text-sm font-semibold text-slate-500">
+                    Not bookable right now
+                  </span>
+                )}
+              </div>
+            </div>
+
             <p className="description-text text-slate-700">{facility.description}</p>
 
             <div className="mt-auto border-t border-slate-100 pt-4 text-xs text-slate-400">

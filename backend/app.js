@@ -12,6 +12,19 @@ const facilityRoutes = require('./routes/facilityRoutes')
 const categoryRoutes = require('./routes/categoryRoutes')
 const userRoutes = require('./routes/userRoutes')
 const dashboardRoutes = require('./routes/dashboardRoutes')
+const reservationRoutes = require('./routes/reservationRoutes')
+const paymentRoutes = require('./routes/paymentRoutes')
+const invoiceRoutes = require('./routes/invoiceRoutes')
+const membershipPlanRoutes = require('./routes/membershipPlanRoutes')
+const membershipRoutes = require('./routes/membershipRoutes')
+const scheduleRoutes = require('./routes/scheduleRoutes')
+const attendanceRoutes = require('./routes/attendanceRoutes')
+const maintenanceRoutes = require('./routes/maintenanceRoutes')
+const notificationRoutes = require('./routes/notificationRoutes')
+const equipmentRoutes = require('./routes/equipmentRoutes')
+const rentalRoutes = require('./routes/rentalRoutes')
+const promotionRoutes = require('./routes/promotionRoutes')
+const reviewRoutes = require('./routes/reviewRoutes')
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -58,6 +71,25 @@ app.use('/api/users', userRoutes)
 
 // Dashboard statistics (admin/manager/staff)
 app.use('/api/dashboard', dashboardRoutes)
+
+// Bookings & availability (Phase 2)
+app.use('/api/reservations', reservationRoutes)
+
+// Business operations (Phase 3)
+app.use('/api/payments', paymentRoutes)
+app.use('/api/invoices', invoiceRoutes)
+app.use('/api/membership-plans', membershipPlanRoutes)
+app.use('/api/memberships', membershipRoutes)
+app.use('/api/schedules', scheduleRoutes)
+app.use('/api/attendance', attendanceRoutes)
+app.use('/api/maintenance', maintenanceRoutes)
+
+// Advanced features (Phase 4)
+app.use('/api/notifications', notificationRoutes)
+app.use('/api/equipment', equipmentRoutes)
+app.use('/api/rentals', rentalRoutes)
+app.use('/api/promotions', promotionRoutes)
+app.use('/api/reviews', reviewRoutes)
 
 // Unknown routes
 app.use((req, res) => {

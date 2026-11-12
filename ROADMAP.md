@@ -2,7 +2,7 @@
 
 This document is the master plan for extending the existing facility-records app
 into the complete role-based sport center system described in the new brief
-(4 roles, customer reservation lifecycle, Phases 1–4).
+(4 roles, customer reservation lifecycle, Phases 1–5).
 
 Everything already built for the coursework (auth with bcrypt, facility CRUD with
 ownership checks, keyword search + category filter, image upload, toasts,
@@ -23,6 +23,16 @@ The original coursework limit of "exactly 3 tables" is **dropped** — the full
 system needs more tables. The database is reset & reseeded (`npm run db:setup`)
 at the start of each phase.
 
+### Implementation status
+
+| Phase | Status |
+|---|---|
+| 1. Core foundation | ✅ implemented |
+| 2. Booking system | ✅ implemented |
+| 3. Business operations | ✅ implemented |
+| 4. Advanced features | pending |
+| 5. Analytics | pending |
+
 ---
 
 ## 2. Roles & permission matrix
@@ -38,7 +48,7 @@ Roles: `admin`, `manager`, `staff`, `customer` (column `users.role`).
 | Create bookings (self) | ✅ | ✅ | ✅ | ✅ |
 | View bookings | all | all | all | own only |
 | Confirm / cancel / check in / complete bookings | ✅ | ✅ | ✅ | cancel own (before start) |
-| Record at-center payments, refunds | ✅ | ✅ | ✅ record | — |
+| Record at-center payments (refunds: admin·manager only) | ✅ | ✅ | record | — |
 | Pay own booking online | ✅ | ✅ | ✅ | ✅ |
 | Invoices (view/print) | ✅ | ✅ | ✅ | own |
 | Membership plans CRUD | ✅ | ✅ | — | — |
@@ -53,6 +63,7 @@ Roles: `admin`, `manager`, `staff`, `customer` (column `users.role`).
 | Reviews | moderate/delete | moderate | — | write own (verified visit) |
 | Notifications | send | send | — | receive / mark read |
 | Dashboards & reports | full system | operations | today's shift | personal |
+| Analytics (revenue, utilization, customers, staff) | ✅ | ✅ | — | — |
 
 Enforcement: `authenticate` (session) → `authorize('admin', 'manager')` role
 middleware on protected routes; ownership checks (`req.user.id` vs row owner)
@@ -215,7 +226,7 @@ Availability rules (enforced server-side inside a transaction):
 3. No overlapping reservation on the same facility with status in
    (`pending`, `confirmed`, `checked_in`, `completed`, `no_show`).
 
-### Phase 3 — business operations
+### Phase 3 — business operations ✅
 
 ```sql
 CREATE TABLE invoices (
@@ -382,6 +393,30 @@ CREATE TABLE reviews (
 );
 ```
 
+### Phase 5 — analytics
+
+Analytics needs **no new tables** — every report is computed from data created
+in Phases 2–4. Two small additions keep the aggregate queries fast:
+
+```sql
+-- payments: speed up revenue-by-day / revenue-by-method reports
+ALTER TABLE payments
+    ADD INDEX idx_pay_paid_at (paid_at);
+
+-- reservations: speed up utilization / performance date-range reports
+ALTER TABLE reservations
+    ADD INDEX idx_res_created (created_at);
+```
+
+Reports are read-only and computed with parameterized SQL:
+
+| Report | Source | Notes |
+|---|---|---|
+| Revenue | `payments` (`status = 'paid'`) joined to `reservations` | totals by day/week/month, by method, by facility |
+| Facility utilization | `reservations` + `facilities` | booked hours ÷ open hours for a date range, revenue per facility, no-show rate |
+| Customer analytics | `users` (`role = 'customer'`) + `reservations` | new vs returning, bookings/revenue per customer, top customers, inactive customers |
+| Staff performance | `reservations` (check-ins, cancellations) + `attendance` + `maintenance_requests` | check-ins processed, bookings handled, attendance rate, maintenance resolved |
+
 ---
 
 ## 5. Backend API design
@@ -419,7 +454,7 @@ messages, no stack traces.
 | `POST /api/reservations/:id/complete` | staff+ | mark `completed` (+ record at-center payment) |
 | `POST /api/reservations/:id/pay` | owner | simulated online payment → `confirmed` |
 
-### Phase 3
+### Phase 3 ✅
 
 | Method & path | Roles | Purpose |
 |---|---|---|
@@ -447,6 +482,23 @@ messages, no stack traces.
 | `POST /api/promotions/validate` | customer | check a code at checkout |
 | `GET/POST /api/facilities/:id/reviews`, `DELETE /api/reviews/:id` | customer write / manager+ moderate | reviews + rating |
 
+### Phase 5
+
+All endpoints require `admin` or `manager`; every one accepts `from` / `to`
+date filters (defaulting to the last 30 days).
+
+| Method & path | Purpose |
+|---|---|
+| `GET /api/analytics/revenue?from=&to=&group_by=day\|week\|month` | Revenue totals, breakdown by method and facility |
+| `GET /api/analytics/utilization?from=&to=` | Booked hours vs open hours per facility, revenue, no-show rate |
+| `GET /api/analytics/customers?from=&to=` | New vs returning customers, top customers, inactive customers |
+| `GET /api/analytics/staff?from=&to=` | Check-ins/booking actions, attendance rate, maintenance resolved |
+| `GET /api/analytics/overview?from=&to=` | Combined KPIs for the analytics dashboard |
+
+| Frontend route | Purpose |
+|---|---|
+| `/analytics` | Tabs for Revenue, Utilization, Customers and Staff reports with date-range filters and simple charts/tables |
+
 ---
 
 ## 6. Frontend pages & routes
@@ -466,7 +518,7 @@ Layout: existing top Navbar stays for public/customer browsing; a sidebar
 - `/bookings` — customer: my bookings (status badges, cancel); staff/manager: all bookings with filters + confirm/check-in/complete/cancel actions
 - `/calendar` — week view per facility for staff/manager
 
-### Phase 3
+### Phase 3 ✅
 - `/payments` — payment list, record at-center, refund, invoice view (printable)
 - `/memberships` — customer: plans + subscribe + current status; manager/admin: plan CRUD
 - `/schedules` — manager: assign shifts; staff: my week
@@ -479,6 +531,10 @@ Layout: existing top Navbar stays for public/customer browsing; a sidebar
 - `/equipment` — browse & rent (customer) / manage (staff+)
 - Promo code input in the booking flow + `/promotions` management
 - Reviews & star rating on facility detail; "write a review" after completed bookings
+
+### Phase 5
+- `/analytics` — management insights: date-range picker, KPI cards, revenue
+  trend, facility utilization table, top customers and staff performance
 
 ---
 
@@ -496,6 +552,7 @@ All stored as bcrypt hashes. Seed per phase:
 - **P2**: reservations across all statuses (past + upcoming), payments, for the demo customer and others
 - **P3**: 3 membership plans, memberships, next-week schedules, attendance, maintenance requests
 - **P4**: equipment + rentals, promotions, notifications, reviews
+- **P5**: analytics uses the data seeded in P2–P4 (no extra seed rows required)
 
 ---
 
@@ -510,6 +567,7 @@ README update. `npm run db:setup` (destructive) runs at the start of each phase.
 | **2. Booking system** | availability endpoint, reservations + payments tables, booking flow, confirmation page, booking management, calendar | full lifecycle testable end-to-end: browse → book → pay → check in → complete; double-booking rejected with a clear message |
 | **3. Business operations** | invoices, memberships + discounts, schedules, attendance, maintenance ↔ facility status | at-center payment recorded at check-in; invoice view; member booking price discounted; maintenance blocks booking |
 | **4. Advanced features** | QR check-in, notifications, equipment rental, promotions, reviews | code check-in works; bell shows unread; promo code reduces total; reviews appear on facility detail |
+| **5. Analytics** | revenue, facility utilization, customer and staff reports + dashboard | managers can pick a date range and see revenue, utilization, top customers and staff performance; numbers reconcile with bookings/payments |
 
 ## 9. Conventions carried over
 

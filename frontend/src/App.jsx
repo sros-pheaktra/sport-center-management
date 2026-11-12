@@ -12,6 +12,20 @@ import DashboardPage from './pages/DashboardPage'
 import UsersPage from './pages/UsersPage'
 import CategoriesPage from './pages/CategoriesPage'
 import ProfilePage from './pages/ProfilePage'
+import BookingPage from './pages/BookingPage'
+import BookingDetailPage from './pages/BookingDetailPage'
+import BookingsPage from './pages/BookingsPage'
+import CalendarPage from './pages/CalendarPage'
+import PaymentsPage from './pages/PaymentsPage'
+import InvoicePage from './pages/InvoicePage'
+import MembershipsPage from './pages/MembershipsPage'
+import SchedulesPage from './pages/SchedulesPage'
+import AttendancePage from './pages/AttendancePage'
+import MaintenancePage from './pages/MaintenancePage'
+import NotificationsPage from './pages/NotificationsPage'
+import EquipmentPage from './pages/EquipmentPage'
+import PromotionsPage from './pages/PromotionsPage'
+import CheckInPage from './pages/CheckInPage'
 import NotFoundPage from './pages/NotFoundPage'
 
 export default function App() {
@@ -29,6 +43,117 @@ export default function App() {
                 <Route path="/facilities/:id" element={<FacilityDetailPage />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
+
+                {/* Booking flow (Phase 2) */}
+                <Route
+                  path="/facilities/:id/book"
+                  element={
+                    <RequireAuth>
+                      <BookingPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/bookings"
+                  element={
+                    <RequireAuth>
+                      <BookingsPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/bookings/:reference"
+                  element={
+                    <RequireAuth>
+                      <BookingDetailPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/calendar"
+                  element={
+                    <RoleGuard roles={['admin', 'manager', 'staff']}>
+                      <CalendarPage />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* Business operations (Phase 3) */}
+                <Route
+                  path="/invoices/:id"
+                  element={
+                    <RequireAuth>
+                      <InvoicePage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/payments"
+                  element={
+                    <RoleGuard roles={['admin', 'manager', 'staff']}>
+                      <PaymentsPage />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/memberships"
+                  element={
+                    <RoleGuard roles={['admin', 'manager', 'customer']}>
+                      <MembershipsPage />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/schedules"
+                  element={
+                    <RoleGuard roles={['admin', 'manager', 'staff']}>
+                      <SchedulesPage />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/attendance"
+                  element={
+                    <RoleGuard roles={['admin', 'manager', 'staff']}>
+                      <AttendancePage />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/maintenance"
+                  element={
+                    <RoleGuard roles={['admin', 'manager', 'staff']}>
+                      <MaintenancePage />
+                    </RoleGuard>
+                  }
+                />
+
+                {/* Advanced features (Phase 4) */}
+                <Route path="/equipment" element={<EquipmentPage />} />
+                <Route
+                  path="/notifications"
+                  element={
+                    <RequireAuth>
+                      <NotificationsPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/check-in"
+                  element={
+                    <RoleGuard roles={['admin', 'manager', 'staff']}>
+                      <CheckInPage />
+                    </RoleGuard>
+                  }
+                />
+                <Route
+                  path="/promotions"
+                  element={
+                    <RoleGuard roles={['admin', 'manager']}>
+                      <PromotionsPage />
+                    </RoleGuard>
+                  }
+                />
 
                 {/* Facility management — admins and managers */}
                 <Route

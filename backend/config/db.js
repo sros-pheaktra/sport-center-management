@@ -11,7 +11,10 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    // DATE columns (schedules, memberships, attendance) are returned
+    // as 'YYYY-MM-DD' strings so they never shift across timezones.
+    dateStrings: ['DATE']
 })
 
 module.exports = pool

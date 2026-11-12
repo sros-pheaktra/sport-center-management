@@ -26,6 +26,10 @@ const FACILITY_SELECT = `
         f.capacity,
         f.open_time,
         f.close_time,
+        (SELECT ROUND(AVG(rv.rating), 1) FROM reviews rv
+         WHERE rv.facility_id = f.id) AS rating_avg,
+        (SELECT COUNT(*) FROM reviews rv
+         WHERE rv.facility_id = f.id) AS review_count,
         f.created_at,
         f.updated_at
     FROM facilities f
@@ -407,5 +411,150 @@ exports.deleteFacility = asyncHandler(async (req, res) => {
 
     res.json({
         message: 'Facility deleted successfully'
+    })
+})
+
+// ---------------------------------------------------------
+// Phase 2: hourly availability
+// ---------------------------------------------------------
+
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+const padNumber = (value) => String(value).padStart(2, '0')
+
+const parseDateValue = (value) => {
+    if (typeof value !== 'string' || !DATE_PATTERN.test(value)) return null
+
+    const [year, month, day] = value.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
+
+    if (
+        date.getFullYear() !== year ||
+        date.getMonth() !== month - 1 ||
+        date.getDate() !== day
+    ) {
+        return null
+    }
+
+    return { year, month, day, value }
+}
+
+const todayValue = () => {
+    const now = new Date()
+    return `${now.getFullYear()}-${padNumber(now.getMonth() + 1)}-${padNumber(now.getDate())}`
+}
+
+const nextDayValue = ({ year, month, day }) => {
+    const next = new Date(year, month - 1, day + 1)
+    return `${next.getFullYear()}-${padNumber(next.getMonth() + 1)}-${padNumber(next.getDate())}`
+}
+
+const toMinutes = (value) => {
+    const [hours, minutes] = String(value).slice(0, 5).split(':').map(Number)
+    return hours * 60 + minutes
+}
+
+const toClock = (minutes) =>
+    `${padNumber(Math.floor(minutes / 60))}:${padNumber(minutes % 60)}`
+
+// GET /api/facilities/:id/availability?date=YYYY-MM-DD
+// Public: returns the facility's hourly grid for one day, marking
+// slots that are in the past, already booked, or unavailable
+// because the facility is closed/under maintenance.
+exports.getFacilityAvailability = asyncHandler(async (req, res) => {
+    const id = Number.parseInt(req.params.id, 10)
+
+    if (!Number.isInteger(id) || id < 1) {
+        return res.status(400).json({
+            message: 'Invalid facility id'
+        })
+    }
+
+    const dateValue = (req.query.date || '').trim() || todayValue()
+    const parsedDate = parseDateValue(dateValue)
+
+    if (!parsedDate) {
+        return res.status(400).json({
+            message: 'Please provide a valid date (YYYY-MM-DD)'
+        })
+    }
+
+    const [facilities] = await db.query(
+        `SELECT id, title, status, price_per_hour, open_time, close_time
+         FROM facilities WHERE id = ?`,
+        [id]
+    )
+
+    if (facilities.length === 0) {
+        return res.status(404).json({
+            message: 'Facility not found. It may have been deleted.'
+        })
+    }
+
+    const facility = facilities[0]
+    const openMinutes = toMinutes(facility.open_time)
+    const closeMinutes = toMinutes(facility.close_time)
+
+    const [takenRows] = await db.query(
+        `SELECT UNIX_TIMESTAMP(starts_at) AS starts_ts,
+                UNIX_TIMESTAMP(ends_at) AS ends_ts
+         FROM reservations
+         WHERE facility_id = ?
+           AND status IN ('pending', 'confirmed', 'checked_in', 'completed', 'no_show')
+           AND starts_at < ?
+           AND ends_at > ?`,
+        [facility.id, `${nextDayValue(parsedDate)} 00:00:00`, `${dateValue} 00:00:00`]
+    )
+
+    const nowSeconds = Date.now() / 1000
+    const slots = []
+
+    for (let start = openMinutes; start + 60 <= closeMinutes; start += 60) {
+        const end = start + 60
+        const startHour = Math.floor(start / 60)
+        const startMinute = start % 60
+        const slotStart = new Date(
+            parsedDate.year,
+            parsedDate.month - 1,
+            parsedDate.day,
+            startHour,
+            startMinute
+        ).getTime() / 1000
+        const slotEnd = slotStart + 60 * 60
+
+        let reason = null
+
+        if (facility.status === 'maintenance') {
+            reason = 'Facility is under maintenance'
+        } else if (facility.status !== 'available') {
+            reason = 'Facility is unavailable'
+        } else if (slotStart <= nowSeconds) {
+            reason = 'This slot has already started'
+        } else {
+            const taken = takenRows.some(
+                (row) => Number(row.starts_ts) < slotEnd && Number(row.ends_ts) > slotStart
+            )
+
+            if (taken) reason = 'Already booked'
+        }
+
+        slots.push({
+            start: toClock(start),
+            end: toClock(end),
+            available: !reason,
+            reason
+        })
+    }
+
+    res.json({
+        facility: {
+            id: facility.id,
+            title: facility.title,
+            status: facility.status,
+            price_per_hour: facility.price_per_hour,
+            open_time: facility.open_time,
+            close_time: facility.close_time
+        },
+        date: dateValue,
+        slots
     })
 })
