@@ -27,7 +27,7 @@ const promotionRoutes = require('./routes/promotionRoutes')
 const reviewRoutes = require('./routes/reviewRoutes')
 
 const app = express()
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT || 5001
 
 // Middleware
 app.use(cors({
