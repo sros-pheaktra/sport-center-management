@@ -32,13 +32,13 @@ router.post('/:id/reviews', authenticate, authorize('customer'), createReview)
 
 router.get('/:id', getFacilityById)
 
-// Admin/manager: create (with one optional JPEG/PNG image, max 2 MB)
-router.post('/', authenticate, authorize('admin', 'manager'), uploadFacilityImage, createFacility)
+// Admin/manager/staff: create (with one optional JPEG/PNG image, max 2 MB)
+router.post('/', authenticate, authorize('admin', 'manager', 'staff'), uploadFacilityImage, createFacility)
 
-// Admin/manager: update (role is re-checked on the server)
-router.put('/:id', authenticate, authorize('admin', 'manager'), uploadFacilityImage, updateFacility)
+// Admin/manager/staff: update (role is re-checked on the server)
+router.put('/:id', authenticate, authorize('admin', 'manager', 'staff'), uploadFacilityImage, updateFacility)
 
-// Admin/manager: delete (role is re-checked on the server)
-router.delete('/:id', authenticate, authorize('admin', 'manager'), deleteFacility)
+// Admin/manager/staff: delete (role is re-checked on the server)
+router.delete('/:id', authenticate, authorize('admin', 'manager', 'staff'), deleteFacility)
 
 module.exports = router

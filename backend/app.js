@@ -14,17 +14,23 @@ const userRoutes = require('./routes/userRoutes')
 const dashboardRoutes = require('./routes/dashboardRoutes')
 const reservationRoutes = require('./routes/reservationRoutes')
 const paymentRoutes = require('./routes/paymentRoutes')
+
+// Phase 3–5 routers are intentionally NOT mounted in this delivery.
+// Scope is Phase 1 (core foundation) + Phase 2 (bookings, payments,
+// check-in). Their route/controller files, utilities and database tables
+// remain in the repository so the features can be re-enabled later.
+//
 const invoiceRoutes = require('./routes/invoiceRoutes')
-const membershipPlanRoutes = require('./routes/membershipPlanRoutes')
-const membershipRoutes = require('./routes/membershipRoutes')
-const scheduleRoutes = require('./routes/scheduleRoutes')
-const attendanceRoutes = require('./routes/attendanceRoutes')
+// const membershipPlanRoutes = require('./routes/membershipPlanRoutes')
+// const membershipRoutes = require('./routes/membershipRoutes')
+// const scheduleRoutes = require('./routes/scheduleRoutes')
+// const attendanceRoutes = require('./routes/attendanceRoutes')
 const maintenanceRoutes = require('./routes/maintenanceRoutes')
-const notificationRoutes = require('./routes/notificationRoutes')
-const equipmentRoutes = require('./routes/equipmentRoutes')
-const rentalRoutes = require('./routes/rentalRoutes')
-const promotionRoutes = require('./routes/promotionRoutes')
-const reviewRoutes = require('./routes/reviewRoutes')
+// const notificationRoutes = require('./routes/notificationRoutes')
+// const equipmentRoutes = require('./routes/equipmentRoutes')
+// const rentalRoutes = require('./routes/rentalRoutes')
+// const promotionRoutes = require('./routes/promotionRoutes')
+// const reviewRoutes = require('./routes/reviewRoutes')
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -75,21 +81,13 @@ app.use('/api/dashboard', dashboardRoutes)
 // Bookings & availability (Phase 2)
 app.use('/api/reservations', reservationRoutes)
 
-// Business operations (Phase 3)
+// Payments are part of the retained Phase 2 booking lifecycle
 app.use('/api/payments', paymentRoutes)
-app.use('/api/invoices', invoiceRoutes)
-app.use('/api/membership-plans', membershipPlanRoutes)
-app.use('/api/memberships', membershipRoutes)
-app.use('/api/schedules', scheduleRoutes)
-app.use('/api/attendance', attendanceRoutes)
-app.use('/api/maintenance', maintenanceRoutes)
 
-// Advanced features (Phase 4)
-app.use('/api/notifications', notificationRoutes)
-app.use('/api/equipment', equipmentRoutes)
-app.use('/api/rentals', rentalRoutes)
-app.use('/api/promotions', promotionRoutes)
-app.use('/api/reviews', reviewRoutes)
+// Phase 3–5 routes (/invoices, /membership-plans, /memberships, /schedules,
+// /attendance, /maintenance, /notifications, /equipment, /rentals,
+// /promotions, /reviews) are not mounted — see the commented block above.
+// Requests to them fall through to the 404 handler below.
 
 // Unknown routes
 app.use((req, res) => {

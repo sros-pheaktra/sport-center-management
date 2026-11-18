@@ -241,7 +241,7 @@ exports.getFacilityById = asyncHandler(async (req, res) => {
     })
 })
 
-// POST /api/facilities  (admin/manager, multipart form with optional image)
+// POST /api/facilities  (admin/manager/staff, multipart form with optional image)
 exports.createFacility = asyncHandler(async (req, res) => {
     const validation = validateFacility(req.body)
 
@@ -293,9 +293,9 @@ exports.createFacility = asyncHandler(async (req, res) => {
     })
 })
 
-// PUT /api/facilities/:id  (admin/manager, optional new image)
+// PUT /api/facilities/:id  (admin/manager/staff, optional new image)
 // Access is enforced by role on the route (authorize middleware):
-// only admins and managers manage the center's facilities.
+// admins, managers and staff manage the center's facilities.
 exports.updateFacility = asyncHandler(async (req, res) => {
     const id = Number.parseInt(req.params.id, 10)
 
@@ -376,7 +376,7 @@ exports.updateFacility = asyncHandler(async (req, res) => {
     })
 })
 
-// DELETE /api/facilities/:id  (admin/manager)
+// DELETE /api/facilities/:id  (admin/manager/staff)
 exports.deleteFacility = asyncHandler(async (req, res) => {
     const id = Number.parseInt(req.params.id, 10)
 
