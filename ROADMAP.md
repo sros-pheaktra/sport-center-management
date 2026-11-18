@@ -4,6 +4,12 @@ This document is the master plan for extending the existing facility-records app
 into the complete role-based sport center system described in the new brief
 (4 roles, customer reservation lifecycle, Phases 1–5).
 
+> **Delivered scope:** Phase 1 (core foundation) and Phase 2 (booking system).
+> Phase 3–5 controllers, routes, tables and page files remain in the repository
+> for future work, but their Express routers are not mounted and their frontend
+> pages are removed from the navigation and route table, so they are not
+> reachable in the delivered app or API.
+
 Everything already built for the coursework (auth with bcrypt, facility CRUD with
 ownership checks, keyword search + category filter, image upload, toasts,
 validation) is **kept and folded into** the larger system — nothing is thrown away.
@@ -27,11 +33,11 @@ at the start of each phase.
 
 | Phase | Status |
 |---|---|
-| 1. Core foundation | ✅ implemented |
-| 2. Booking system | ✅ implemented |
-| 3. Business operations | ✅ implemented |
-| 4. Advanced features | implemented |
-| 5. Analytics | pending |
+| 1. Core foundation | ✅ delivered |
+| 2. Booking system | ✅ delivered |
+| 3. Business operations | 🔒 retained, disabled in UI/routes |
+| 4. Advanced features | 🔒 retained, disabled in UI/routes |
+| 5. Analytics | 🔒 out of scope |
 
 ---
 
@@ -43,7 +49,7 @@ Roles: `admin`, `manager`, `staff`, `customer` (column `users.role`).
 |---|:--:|:--:|:--:|:--:|
 | Manage users of all roles (create/edit/deactivate/delete) | ✅ | — | — | — |
 | Manage staff accounts (create/edit/deactivate) | ✅ | ✅ | — | — |
-| Facility CRUD | ✅ | ✅ | view | view |
+| Facility CRUD | ✅ | ✅ | ✅ | browse |
 | Category CRUD | ✅ | ✅ | — | — |
 | Create bookings (self) | ✅ | ✅ | ✅ | ✅ |
 | View bookings | all | all | all | own only |
@@ -436,7 +442,7 @@ messages, no stack traces.
 | `POST /api/users` | admin (any role), manager (staff only) | create account |
 | `PUT /api/users/:id` | admin, manager (role limits) | edit name/phone/role/password/is_active |
 | `DELETE /api/users/:id` | admin | hard delete |
-| `GET/POST/PUT/DELETE /api/facilities...` | read: all · write: admin, manager (+creator) | existing CRUD, now role-gated |
+| `GET/POST/PUT/DELETE /api/facilities...` | read: all · write: admin, manager, staff | existing CRUD, now role-gated |
 | `GET/POST/PUT/DELETE /api/categories...` | read: all · write: admin, manager | existing |
 | `GET /api/dashboard/stats` | admin, manager | counts for dashboard cards |
 
@@ -454,7 +460,7 @@ messages, no stack traces.
 | `POST /api/reservations/:id/complete` | staff+ | mark `completed` (+ record at-center payment) |
 | `POST /api/reservations/:id/pay` | owner | simulated online payment → `confirmed` |
 
-### Phase 3 ✅
+### Phase 3 — business operations (retained, disabled in UI)
 
 | Method & path | Roles | Purpose |
 |---|---|---|
@@ -513,12 +519,13 @@ Layout: existing top Navbar stays for public/customer browsing; a sidebar
 - Facilities pages: buttons gated by role; `RoleGuard` redirects with a toast
 
 ### Phase 2
-- `/facilities/:id/book?date=` — slot picker (grid of hourly slots, taken ones disabled), booking summary, payment choice
+- `/book` — unified booking form: choose a facility, date, time, duration and payment method in one place
+- `/facilities/:id/book?date=` — same form with the facility preselected from its detail page
 - `/bookings/:reference` — confirmation page: reference, check-in code, QR-ready, pay online, cancel
 - `/bookings` — customer: my bookings (status badges, cancel); staff/manager: all bookings with filters + confirm/check-in/complete/cancel actions
 - `/calendar` — week view per facility for staff/manager
 
-### Phase 3 ✅
+### Phase 3 — business operations (retained, disabled in UI)
 - `/payments` — payment list, record at-center, refund, invoice view (printable)
 - `/memberships` — customer: plans + subscribe + current status; manager/admin: plan CRUD
 - `/schedules` — manager: assign shifts; staff: my week
@@ -560,6 +567,8 @@ All stored as bcrypt hashes. Seed per phase:
 
 Each phase = one working session: schema + seed → backend → frontend → test →
 README update. `npm run db:setup` (destructive) runs at the start of each phase.
+Only Phases 1–2 are exposed in the delivered app; Phases 3–5 remain implemented
+in the codebase but their API routers and frontend routes are disabled.
 
 | Phase | Scope | Done when |
 |---|---|---|

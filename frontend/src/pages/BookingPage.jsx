@@ -1,20 +1,117 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useToast } from '../context/ToastContext'
 import Loading from '../components/Loading'
 import { formatPrice, formatTime } from '../utils/format'
 import { todayInputValue } from '../utils/reservation'
 
-// Customer booking flow: choose a date, pick an hourly slot, choose a
-// duration and pay online or at the center.
+// Booking form for both entry points:
+//   /book                    → choose a facility, then book it
+//   /facilities/:id/book     → facility already chosen from its detail page
 export default function BookingPage() {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
+  const initialId = id || searchParams.get('facility') || ''
 
-  return <BookingFlow key={id} facilityId={id} />
+  // The key resets the flow whenever the target facility changes.
+  return <BookingShell key={initialId} initialId={initialId} hasParam={Boolean(id)} />
 }
 
-function BookingFlow({ facilityId }) {
+function BookingShell({ initialId, hasParam }) {
+  const [facilityId, setFacilityId] = useState(initialId)
+
+  return (
+    <div className="mx-auto max-w-5xl px-4 py-8">
+      {!hasParam && (
+        <FacilitySelect value={facilityId} onChange={setFacilityId} />
+      )}
+
+      {facilityId ? (
+        <BookingFlow
+          key={facilityId}
+          facilityId={facilityId}
+          hasParam={hasParam}
+          onClear={hasParam ? undefined : () => setFacilityId('')}
+        />
+      ) : (
+        !hasParam && (
+          <p className="mt-6 rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center text-sm text-slate-500">
+            Choose a facility above to see its available times.
+          </p>
+        )
+      )}
+    </div>
+  )
+}
+
+function FacilitySelect({ value, onChange }) {
+  const [facilities, setFacilities] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    let active = true
+
+    api('/facilities?status=available')
+      .then((data) => {
+        if (!active) return
+        setFacilities(data.facilities || [])
+        setLoading(false)
+      })
+      .catch(() => {
+        if (!active) return
+        setError('Could not load the facility list. Please try again.')
+        setLoading(false)
+      })
+
+    return () => { active = false }
+  }, [])
+
+  return (
+    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+        New booking
+      </h1>
+      <p className="mt-1 text-sm text-slate-600">
+        Pick a facility, then choose a date and time below — no need to leave this page.
+      </p>
+
+      {loading ? (
+        <div className="mt-5">
+          <Loading label="Loading facilities…" />
+        </div>
+      ) : error ? (
+        <p className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </p>
+      ) : facilities.length === 0 ? (
+        <p className="mt-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          No facilities are available for booking right now. Please check back later.
+        </p>
+      ) : (
+        <label className="mt-5 block text-sm font-medium text-slate-700">
+          Facility
+          <select
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+          >
+            <option value="">Choose a facility…</option>
+            {facilities.map((facility) => (
+              <option key={facility.id} value={facility.id}>
+                {facility.title} · {formatPrice(facility.price_per_hour)}/hour ·{' '}
+                {formatTime(facility.open_time)}–{formatTime(facility.close_time)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+    </section>
+  )
+}
+
+function BookingFlow({ facilityId, hasParam, onClear }) {
   const [facility, setFacility] = useState(null)
   const [state, setState] = useState('loading') // loading | ready | missing | error
   const [date, setDate] = useState(todayInputValue())
@@ -42,8 +139,8 @@ function BookingFlow({ facilityId }) {
 
   if (state === 'missing') {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <h1 className="text-xl font-semibold text-slate-800">Facility not found</h1>
+      <div className="mt-6 rounded-xl border border-slate-200 bg-white p-8 text-center">
+        <h2 className="text-xl font-semibold text-slate-800">Facility not found</h2>
         <p className="mt-2 text-slate-600">This facility may have been deleted.</p>
         <Link to="/" className="mt-6 inline-block text-sm font-medium text-blue-700 hover:underline">
           ← Back to all facilities
@@ -54,24 +151,36 @@ function BookingFlow({ facilityId }) {
 
   if (state === 'error') {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center text-red-700">
+      <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700">
         Could not load this facility. Please try again.
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <Link
-        to={`/facilities/${facility.id}`}
-        className="text-sm font-medium text-blue-700 hover:underline"
-      >
-        ← Back to {facility.title}
-      </Link>
+    <>
+      {hasParam ? (
+        <Link
+          to={`/facilities/${facility.id}`}
+          className="mt-6 inline-block text-sm font-medium text-blue-700 hover:underline"
+        >
+          ← Back to {facility.title}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          onClick={onClear}
+          className="mt-4 text-sm font-medium text-blue-700 hover:underline"
+        >
+          ← Choose another facility
+        </button>
+      )}
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Book {facility.title}</h1>
+          <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">
+            Book {facility.title}
+          </h2>
           <p className="mt-1 text-slate-600">
             {facility.category_name} · {formatPrice(facility.price_per_hour)}/hour · open{' '}
             {formatTime(facility.open_time)}–{formatTime(facility.close_time)}
@@ -105,7 +214,7 @@ function BookingFlow({ facilityId }) {
         facility={facility}
         date={date}
       />
-    </div>
+    </>
   )
 }
 
@@ -117,7 +226,6 @@ function SlotPicker({ facility, date }) {
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
-  const [membership, setMembership] = useState(null)
 
   const [selected, setSelected] = useState('')
   const [hours, setHours] = useState(1)
@@ -125,17 +233,6 @@ function SlotPicker({ facility, date }) {
   const [paymentMethod, setPaymentMethod] = useState('online')
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState('')
-
-  // Discounts are previewed here; the server recalculates them on save.
-  useEffect(() => {
-    let active = true
-
-    api('/memberships/mine')
-      .then((data) => { if (active) setMembership(data.membership) })
-      .catch(() => {})
-
-    return () => { active = false }
-  }, [])
 
   useEffect(() => {
     let active = true
@@ -172,13 +269,7 @@ function SlotPicker({ facility, date }) {
 
   const safeHours = Math.min(hours, maxHours)
   const subtotal = Number(facility.price_per_hour) * safeHours
-  const discountPercent = membership
-    ? Number(membership.booking_discount_percent)
-    : 0
-  const discountAmount = Math.round(
-    subtotal * (discountPercent / 100) * 100
-  ) / 100
-  const total = Math.max(0, subtotal - discountAmount)
+  const total = subtotal
 
   const chooseStart = (start) => {
     setSelected(start)
@@ -384,20 +475,6 @@ function SlotPicker({ facility, date }) {
               <dt className="text-slate-500">Hours</dt>
               <dd className="font-medium text-slate-800">{safeHours}</dd>
             </div>
-            {discountAmount > 0 && (
-              <>
-                <div className="flex justify-between">
-                  <dt className="text-slate-500">Subtotal</dt>
-                  <dd className="font-medium text-slate-800">{formatPrice(subtotal)}</dd>
-                </div>
-                <div className="flex justify-between text-emerald-700">
-                  <dt>
-                    {membership.plan_name} ({discountPercent}% off)
-                  </dt>
-                  <dd className="font-medium">−{formatPrice(discountAmount)}</dd>
-                </div>
-              </>
-            )}
             <div className="flex justify-between border-t border-slate-200 pt-2 text-base">
               <dt className="font-semibold text-slate-900">Total</dt>
               <dd className="font-bold text-slate-900">{formatPrice(total)}</dd>

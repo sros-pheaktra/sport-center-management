@@ -4,6 +4,7 @@ import {
   ArrowRight,
   Building2,
   CalendarCheck,
+  CalendarDays,
   CalendarPlus,
   Clock3,
   CreditCard,
@@ -12,8 +13,7 @@ import {
   TrendingDown,
   TrendingUp,
   UserPlus,
-  Users,
-  Wrench
+  Users
 } from 'lucide-react'
 import { api } from '../api'
 import { useAuth } from '../context/AuthContext'
@@ -26,7 +26,7 @@ import DashboardChart from '../components/dashboard/DashboardChart'
 import { revenueInView } from '../utils/dashboardChart'
 import ActivityList from '../components/dashboard/ActivityList'
 import { formatPrice } from '../utils/format'
-import { canManageContent, canManageUsers, isStaffSide } from '../utils/roles'
+import { canManageFacilities, canManageUsers, isStaffSide } from '../utils/roles'
 
 const RANGES = [
   { value: 'daily', label: 'Daily' },
@@ -136,7 +136,9 @@ function StaffDashboard({ user }) {
 
   const { stats } = data
   const todayBookings = data.today_bookings || []
-  const recentActivity = data.recent_activity || []
+  const recentActivity = (data.recent_activity || []).filter(
+    (item) => item.type !== 'maintenance'
+  )
   const recentUsers = data.recent_users || []
   const recentFacilities = data.recent_facilities || []
   const revenueSeries = data.revenue_series || { daily: [], weekly: [], monthly: [] }
@@ -179,7 +181,7 @@ function StaffDashboard({ user }) {
 
   const quickActions = [
     {
-      to: '/',
+      to: '/book',
       label: 'Create booking',
       description: 'Reserve a court or facility',
       icon: CalendarPlus,
@@ -200,7 +202,7 @@ function StaffDashboard({ user }) {
           icon: ScanLine,
           tone: 'bg-emerald-50 text-emerald-600'
         },
-    canManageContent(user)
+    canManageFacilities(user)
       ? {
           to: '/facilities/new',
           label: 'Add facility',
@@ -209,10 +211,10 @@ function StaffDashboard({ user }) {
           tone: 'bg-violet-50 text-violet-600'
         }
       : {
-          to: '/maintenance',
-          label: 'New maintenance job',
-          description: 'Log an issue for staff',
-          icon: Wrench,
+          to: '/calendar',
+          label: 'Open calendar',
+          description: 'Review the booking schedule',
+          icon: CalendarDays,
           tone: 'bg-violet-50 text-violet-600'
         },
     {
@@ -259,11 +261,11 @@ function StaffDashboard({ user }) {
           hint={`${Number(stats.pending_bookings) || 0} pending approval`}
         />
         <StatCard
-          title="Active members"
-          value={Number(stats.active_memberships) || 0}
+          title="Registered customers"
+          value={Number(usersByRole.customer) || 0}
           icon={Users}
           tone="emerald"
-          hint={`${Number(usersByRole.customer) || 0} customer accounts`}
+          hint={`${Number(stats.total_users) || 0} total accounts`}
         />
         <StatCard
           title="Total revenue"
@@ -288,11 +290,11 @@ function StaffDashboard({ user }) {
           hint={`${Number(stats.today_bookings) || 0} scheduled today`}
         />
         <StatCard
-          title="Equipment maintenance"
-          value={Number(stats.equipment_maintenance) || 0}
-          icon={Wrench}
+          title="Today's bookings"
+          value={Number(stats.today_bookings) || 0}
+          icon={CalendarDays}
           tone="red"
-          hint={`${Number(stats.overdue_rentals) || 0} overdue rentals`}
+          hint={`${todayBookings.length} on today's schedule`}
         />
       </div>
 
@@ -508,12 +510,7 @@ function StaffDashboard({ user }) {
         <Panel
           className="lg:col-span-2"
           title="Recent activity"
-          description="Bookings, member sign-ups, payments and maintenance updates"
-          action={
-            <Link to="/notifications" className="text-xs font-semibold text-blue-600 hover:text-blue-700">
-              Notifications
-            </Link>
-          }
+          description="Bookings, customer sign-ups and payments"
         >
           <ActivityList items={recentActivity} now={now} />
         </Panel>
@@ -574,7 +571,7 @@ function CustomerDashboard({ name }) {
         </h2>
         <p className="mt-2 max-w-2xl text-sm text-slate-600">
           Browse the center&apos;s facilities to find a court that suits you, then manage
-          your bookings, membership and payments from one place.
+          your bookings from one place.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">
@@ -586,7 +583,6 @@ function CustomerDashboard({ name }) {
             <ArrowRight className="h-4 w-4" />
           </Link>
           <QuickLink to="/bookings">My bookings</QuickLink>
-          <QuickLink to="/memberships">My membership</QuickLink>
           <QuickLink to="/profile">My profile</QuickLink>
         </div>
       </div>

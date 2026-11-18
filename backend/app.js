@@ -20,12 +20,12 @@ const paymentRoutes = require('./routes/paymentRoutes')
 // check-in). Their route/controller files, utilities and database tables
 // remain in the repository so the features can be re-enabled later.
 //
-const invoiceRoutes = require('./routes/invoiceRoutes')
+// const invoiceRoutes = require('./routes/invoiceRoutes')
 // const membershipPlanRoutes = require('./routes/membershipPlanRoutes')
 // const membershipRoutes = require('./routes/membershipRoutes')
 // const scheduleRoutes = require('./routes/scheduleRoutes')
 // const attendanceRoutes = require('./routes/attendanceRoutes')
-const maintenanceRoutes = require('./routes/maintenanceRoutes')
+// const maintenanceRoutes = require('./routes/maintenanceRoutes')
 // const notificationRoutes = require('./routes/notificationRoutes')
 // const equipmentRoutes = require('./routes/equipmentRoutes')
 // const rentalRoutes = require('./routes/rentalRoutes')

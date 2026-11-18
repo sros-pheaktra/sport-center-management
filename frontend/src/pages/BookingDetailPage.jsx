@@ -163,12 +163,6 @@ function BookingDetail({ reference }) {
                 <dt className="text-slate-500">Subtotal</dt>
                 <dd className="text-slate-800">{formatPrice(reservation.subtotal)}</dd>
               </div>
-              {Number(reservation.discount_amount) > 0 && (
-                <div className="flex justify-between gap-3 text-emerald-700">
-                  <dt>Membership discount</dt>
-                  <dd className="font-medium">−{formatPrice(reservation.discount_amount)}</dd>
-                </div>
-              )}
               <div className="flex justify-between gap-3">
                 <dt className="text-slate-500">Total</dt>
                 <dd className="font-semibold text-slate-900">{formatPrice(reservation.total_price)}</dd>
@@ -187,12 +181,9 @@ function BookingDetail({ reference }) {
                 <div className="flex justify-between gap-3">
                   <dt className="text-slate-500">Invoice</dt>
                   <dd className="flex flex-wrap items-center justify-end gap-2">
-                    <Link
-                      to={`/invoices/${reservation.invoice_id}`}
-                      className="font-mono text-xs font-medium text-blue-700 hover:underline"
-                    >
+                    <span className="font-mono text-xs font-medium text-slate-600">
                       {reservation.invoice_number}
-                    </Link>
+                    </span>
                     <InvoiceStatusBadge status={reservation.invoice_status} />
                   </dd>
                 </div>

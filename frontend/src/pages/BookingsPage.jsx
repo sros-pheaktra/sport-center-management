@@ -53,7 +53,7 @@ export default function BookingsPage() {
           </p>
         </div>
         <Link
-          to="/"
+          to="/book"
           className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
         >
           + Book a facility

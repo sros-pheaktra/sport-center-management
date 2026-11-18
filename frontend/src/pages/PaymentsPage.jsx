@@ -17,7 +17,7 @@ const METHOD_LABELS = {
 }
 
 // Staff-side payments overview: filter the ledger, record at-center
-// payments, refund paid ones and jump to printable invoices.
+// payments, refund paid ones and review invoice status.
 export default function PaymentsPage() {
   const { user } = useAuth()
   const { success, error } = useToast()
@@ -73,7 +73,7 @@ export default function PaymentsPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-slate-900">Payments</h1>
         <p className="mt-1 text-slate-600">
-          Every online and at-center payment, with its invoice and booking.
+          Every online and at-center payment, with its booking.
         </p>
       </div>
 
@@ -297,12 +297,9 @@ function PaymentResults({
                 <td className="px-4 py-3">
                   {payment.invoice_id ? (
                     <div className="space-y-1">
-                      <Link
-                        to={`/invoices/${payment.invoice_id}`}
-                        className="font-mono text-xs font-medium text-blue-700 hover:underline"
-                      >
+                      <span className="font-mono text-xs font-medium text-slate-600">
                         {payment.invoice_number}
-                      </Link>
+                      </span>
                       <div><InvoiceStatusBadge status={payment.invoice_status} /></div>
                     </div>
                   ) : (

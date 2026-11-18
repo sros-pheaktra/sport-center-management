@@ -16,7 +16,6 @@ import {
 import { api } from '../../api'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
-import NotificationBell from '../NotificationBell'
 import RoleBadge from '../RoleBadge'
 import { getPageMeta, getSearchableNavItems } from '../../utils/navigation'
 
@@ -129,7 +128,7 @@ export default function Header({
 
   const primaryAction = user
     ? user.role === 'customer'
-      ? { label: 'New booking', to: '/', icon: Plus }
+      ? { label: 'New booking', to: '/book', icon: Plus }
       : { label: 'Check in', to: '/check-in', icon: ScanLine }
     : null
 
@@ -259,8 +258,6 @@ export default function Header({
             <span className="hidden lg:inline">{primaryAction.label}</span>
           </Link>
         )}
-
-        {user && <NotificationBell user={user} />}
 
         {/* User menu */}
         {user ? (

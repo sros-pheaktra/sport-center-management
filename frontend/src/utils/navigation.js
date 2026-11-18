@@ -1,23 +1,22 @@
 import {
-  BadgePercent,
   Building2,
   CalendarCheck,
   CalendarDays,
-  ClipboardList,
+  CalendarPlus,
   CreditCard,
-  Crown,
-  Dumbbell,
   LayoutDashboard,
   ScanLine,
   Tags,
-  UserCheck,
-  Users,
-  Wrench
+  Users
 } from 'lucide-react'
 
 // Single source of truth for the sidebar, the page header and the
 // global search. The server still checks every role on each request —
 // this list only decides what is shown in the interface.
+//
+// Only Phase 1 (core foundation) and Phase 2 (booking system) features
+// are exposed. Phase 3–5 pages, controllers and tables still exist but
+// are intentionally left out of the navigation and routes.
 const STAFF_ROLES = ['admin', 'manager', 'staff']
 const MANAGER_ROLES = ['admin', 'manager']
 const ALL_ROLES = ['admin', 'manager', 'staff', 'customer']
@@ -49,13 +48,6 @@ export const NAV_GROUPS = [
           pathname === '/' || pathname.startsWith('/facilities')
       },
       {
-        to: '/equipment',
-        label: 'Equipment',
-        icon: Dumbbell,
-        public: true,
-        match: (pathname) => matchesSection(pathname, '/equipment')
-      },
-      {
         to: '/bookings',
         label: 'Bookings',
         icon: CalendarCheck,
@@ -66,24 +58,6 @@ export const NAV_GROUPS = [
         to: '/calendar',
         label: 'Calendar',
         icon: CalendarDays,
-        roles: STAFF_ROLES
-      },
-      {
-        to: '/schedules',
-        label: 'Schedules',
-        icon: ClipboardList,
-        roles: STAFF_ROLES
-      },
-      {
-        to: '/attendance',
-        label: 'Attendance',
-        icon: UserCheck,
-        roles: STAFF_ROLES
-      },
-      {
-        to: '/maintenance',
-        label: 'Maintenance',
-        icon: Wrench,
         roles: STAFF_ROLES
       },
       {
@@ -102,18 +76,6 @@ export const NAV_GROUPS = [
         label: 'Payments',
         icon: CreditCard,
         roles: STAFF_ROLES
-      },
-      {
-        to: '/promotions',
-        label: 'Promotions',
-        icon: BadgePercent,
-        roles: MANAGER_ROLES
-      },
-      {
-        to: '/memberships',
-        label: 'Memberships',
-        icon: Crown,
-        roles: ['admin', 'manager', 'customer']
       }
     ]
   },
@@ -161,8 +123,11 @@ export const isNavItemActive = (item, pathname) => {
 }
 
 // Flat list used by the header search.
-export const getSearchableNavItems = (user) =>
-  getVisibleNavGroups(user).flatMap((group) =>
+export const getSearchableNavItems = (user) => [
+  ...(user
+    ? [{ label: 'New booking', group: 'Management', to: '/book', icon: CalendarPlus }]
+    : []),
+  ...getVisibleNavGroups(user).flatMap((group) =>
     group.items.map((item) => ({
       label: navItemLabel(item, user),
       group: group.label,
@@ -170,6 +135,7 @@ export const getSearchableNavItems = (user) =>
       icon: item.icon
     }))
   )
+]
 
 const PAGE_META = [
   { pattern: /^\/$/, title: 'Facilities', section: 'Management' },
@@ -178,21 +144,14 @@ const PAGE_META = [
   { pattern: /^\/facilities\/[^/]+\/edit$/, title: 'Edit facility', section: 'Management' },
   { pattern: /^\/facilities\/[^/]+\/book$/, title: 'Book facility', section: 'Management' },
   { pattern: /^\/facilities\/[^/]+$/, title: 'Facility details', section: 'Management' },
-  { pattern: /^\/equipment$/, title: 'Equipment', section: 'Management' },
   { pattern: /^\/bookings$/, title: 'Bookings', section: 'Management' },
   { pattern: /^\/bookings\/[^/]+$/, title: 'Booking details', section: 'Management' },
   { pattern: /^\/calendar$/, title: 'Booking calendar', section: 'Management' },
-  { pattern: /^\/schedules$/, title: 'Staff schedules', section: 'Management' },
-  { pattern: /^\/attendance$/, title: 'Attendance', section: 'Management' },
-  { pattern: /^\/maintenance$/, title: 'Maintenance', section: 'Management' },
+  { pattern: /^\/book$/, title: 'New booking', section: 'Management' },
   { pattern: /^\/check-in$/, title: 'Check-in', section: 'Management' },
   { pattern: /^\/payments$/, title: 'Payments', section: 'Finance & Services' },
-  { pattern: /^\/promotions$/, title: 'Promotions', section: 'Finance & Services' },
-  { pattern: /^\/memberships$/, title: 'Memberships', section: 'Finance & Services' },
-  { pattern: /^\/invoices\/[^/]+$/, title: 'Invoice', section: 'Finance & Services' },
   { pattern: /^\/users$/, title: 'Users', section: 'Administration' },
   { pattern: /^\/categories$/, title: 'Categories', section: 'Administration' },
-  { pattern: /^\/notifications$/, title: 'Notifications', section: 'Overview' },
   { pattern: /^\/profile$/, title: 'Profile', section: 'Account' },
   { pattern: /^\/settings$/, title: 'Settings', section: 'Account' },
   { pattern: /^\/login$/, title: 'Log in', section: 'Account' },

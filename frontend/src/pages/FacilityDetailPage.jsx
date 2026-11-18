@@ -8,7 +8,7 @@ import FacilityImage from '../components/FacilityImage'
 import ConfirmDialog from '../components/ConfirmDialog'
 import Loading from '../components/Loading'
 import { formatDate, formatPrice, formatTime } from '../utils/format'
-import { canManageContent } from '../utils/roles'
+import { canManageFacilities } from '../utils/roles'
 
 export default function FacilityDetailPage() {
   const { id } = useParams()
@@ -94,7 +94,7 @@ function FacilityDetail({ id }) {
     )
   }
 
-  const canManage = canManageContent(user)
+  const canManage = canManageFacilities(user)
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -190,8 +190,8 @@ function FacilityDetail({ id }) {
               )}
             </div>
 
-            {/* Only admins and managers see these — the server
-                re-checks the role on every write anyway */}
+            {/* Only admins, managers and staff see these — the
+                server re-checks the role on every write anyway */}
             {canManage && (
               <div className="flex gap-3">
                 <Link

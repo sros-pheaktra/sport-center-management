@@ -4,7 +4,7 @@ import { api } from '../api'
 import { useAuth } from '../context/AuthContext'
 import FacilityCard from '../components/FacilityCard'
 import Loading from '../components/Loading'
-import { canManageContent } from '../utils/roles'
+import { canManageFacilities } from '../utils/roles'
 
 export default function FacilitiesPage() {
   const { user } = useAuth()
@@ -52,7 +52,7 @@ export default function FacilitiesPage() {
             Browse all facilities, or narrow things down with the search and filters.
           </p>
         </div>
-        {canManageContent(user) && (
+        {canManageFacilities(user) && (
           <Link
             to="/facilities/new"
             className="rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
@@ -192,7 +192,7 @@ function FacilityResults({ search, categoryId, status, hasFilters, onClearFilter
               Clear filters
             </button>
           )}
-          {canManageContent(user) && (
+          {canManageFacilities(user) && (
             <Link
               to="/facilities/new"
               className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"

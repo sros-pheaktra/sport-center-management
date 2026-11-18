@@ -5,6 +5,10 @@
 export const canManageContent = (user) =>
   Boolean(user) && (user.role === 'admin' || user.role === 'manager')
 
+// facilities are managed by admins, managers and staff
+export const canManageFacilities = (user) =>
+  Boolean(user) && ['admin', 'manager', 'staff'].includes(user.role)
+
 // admin + manager manage user & staff accounts
 export const canManageUsers = (user) =>
   Boolean(user) && (user.role === 'admin' || user.role === 'manager')

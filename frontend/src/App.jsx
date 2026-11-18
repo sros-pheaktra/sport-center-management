@@ -17,18 +17,13 @@ import BookingDetailPage from './pages/BookingDetailPage'
 import BookingsPage from './pages/BookingsPage'
 import CalendarPage from './pages/CalendarPage'
 import PaymentsPage from './pages/PaymentsPage'
-import InvoicePage from './pages/InvoicePage'
-import MembershipsPage from './pages/MembershipsPage'
-import SchedulesPage from './pages/SchedulesPage'
-import AttendancePage from './pages/AttendancePage'
-import MaintenancePage from './pages/MaintenancePage'
-import NotificationsPage from './pages/NotificationsPage'
-import EquipmentPage from './pages/EquipmentPage'
-import PromotionsPage from './pages/PromotionsPage'
 import CheckInPage from './pages/CheckInPage'
 import SettingsPage from './pages/SettingsPage'
 import NotFoundPage from './pages/NotFoundPage'
 
+// Phase 1 (core foundation) and Phase 2 (booking system) routes only.
+// Phase 3–5 pages and controllers remain on disk for future work, but
+// they are not reachable from the interface.
 export default function App() {
   return (
     <BrowserRouter>
@@ -43,6 +38,14 @@ export default function App() {
                 <Route path="/register" element={<RegisterPage />} />
 
                 {/* Booking flow (Phase 2) */}
+                <Route
+                  path="/book"
+                  element={
+                    <RequireAuth>
+                      <BookingPage />
+                    </RequireAuth>
+                  }
+                />
                 <Route
                   path="/facilities/:id/book"
                   element={
@@ -75,65 +78,12 @@ export default function App() {
                     </RoleGuard>
                   }
                 />
-
-                {/* Business operations (Phase 3) */}
-                <Route
-                  path="/invoices/:id"
-                  element={
-                    <RequireAuth>
-                      <InvoicePage />
-                    </RequireAuth>
-                  }
-                />
                 <Route
                   path="/payments"
                   element={
                     <RoleGuard roles={['admin', 'manager', 'staff']}>
                       <PaymentsPage />
                     </RoleGuard>
-                  }
-                />
-                <Route
-                  path="/memberships"
-                  element={
-                    <RoleGuard roles={['admin', 'manager', 'customer']}>
-                      <MembershipsPage />
-                    </RoleGuard>
-                  }
-                />
-                <Route
-                  path="/schedules"
-                  element={
-                    <RoleGuard roles={['admin', 'manager', 'staff']}>
-                      <SchedulesPage />
-                    </RoleGuard>
-                  }
-                />
-                <Route
-                  path="/attendance"
-                  element={
-                    <RoleGuard roles={['admin', 'manager', 'staff']}>
-                      <AttendancePage />
-                    </RoleGuard>
-                  }
-                />
-                <Route
-                  path="/maintenance"
-                  element={
-                    <RoleGuard roles={['admin', 'manager', 'staff']}>
-                      <MaintenancePage />
-                    </RoleGuard>
-                  }
-                />
-
-                {/* Advanced features (Phase 4) */}
-                <Route path="/equipment" element={<EquipmentPage />} />
-                <Route
-                  path="/notifications"
-                  element={
-                    <RequireAuth>
-                      <NotificationsPage />
-                    </RequireAuth>
                   }
                 />
                 <Route
@@ -144,20 +94,12 @@ export default function App() {
                     </RoleGuard>
                   }
                 />
-                <Route
-                  path="/promotions"
-                  element={
-                    <RoleGuard roles={['admin', 'manager']}>
-                      <PromotionsPage />
-                    </RoleGuard>
-                  }
-                />
 
-                {/* Facility management — admins and managers */}
+                {/* Facility management — admins, managers and staff */}
                 <Route
                   path="/facilities/new"
                   element={
-                    <RoleGuard roles={['admin', 'manager']}>
+                    <RoleGuard roles={['admin', 'manager', 'staff']}>
                       <FacilityFormPage mode="create" />
                     </RoleGuard>
                   }
@@ -165,7 +107,7 @@ export default function App() {
                 <Route
                   path="/facilities/:id/edit"
                   element={
-                    <RoleGuard roles={['admin', 'manager']}>
+                    <RoleGuard roles={['admin', 'manager', 'staff']}>
                       <FacilityFormPage mode="edit" />
                     </RoleGuard>
                   }

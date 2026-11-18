@@ -4,22 +4,26 @@ A full-stack sport center management system with four roles, facility
 management and a complete customer booking lifecycle. Customers browse
 facilities, pick an hourly slot, pay online (simulated) or at the center,
 receive a booking reference and check-in code, and staff manage the booking
-through check-in and completion. Business operations cover invoices,
-membership discounts, staff schedules and attendance, and maintenance
-workflows that automatically take facilities out of booking.
+through check-in and completion.
+
+**Delivered scope: Phase 1 (core foundation) and Phase 2 (booking system).**
+The Phase 3–5 backend controllers, routes, tables and page files are kept in
+the repository for future work, but their Express routers are not mounted and
+their pages are removed from the navigation and route table, so they are not
+reachable from the interface or the API.
 
 Built with **Node.js + Express**, **MySQL**, and a **React (Vite)** frontend
 that talks to the REST API with `fetch` and session cookies.
 
-The project grows in five phases (see [`ROADMAP.md`](ROADMAP.md)):
+The project was designed in five phases (see [`ROADMAP.md`](ROADMAP.md)):
 
 | Phase | Scope | Status |
 |---|---|---|
-| **1. Core foundation** | roles + RBAC, admin dashboard, user/staff management, facility & category CRUD | ✅ implemented |
-| **2. Booking system** | availability, calendar, reservations, cancellation, online/at-center payment, check-in/completion | ✅ implemented |
-| **3. Business operations** | invoices, membership plans, staff schedules/attendance, maintenance | ✅ implemented |
-| **4. Advanced features** | QR check-in, notifications, equipment rental, promotions, reviews | implemented |
-| **5. Analytics** | revenue, facility utilization, customer and staff performance reports | planned |
+| **1. Core foundation** | roles + RBAC, admin dashboard, user/staff management, facility & category CRUD | ✅ delivered |
+| **2. Booking system** | availability, calendar, reservations, cancellation, online/at-center payment, check-in/completion | ✅ delivered |
+| **3. Business operations** | invoices, membership plans, staff schedules/attendance, maintenance | 🔒 code retained, disabled in UI/routes |
+| **4. Advanced features** | QR check-in, notifications, equipment rental, promotions, reviews | 🔒 code retained, disabled in UI/routes |
+| **5. Analytics** | revenue, facility utilization, customer and staff performance reports | 🔒 planned, out of scope |
 
 ---
 
@@ -28,20 +32,21 @@ The project grows in five phases (see [`ROADMAP.md`](ROADMAP.md)):
 | Capability | Admin | Manager | Staff | Customer |
 |---|:--:|:--:|:--:|:--:|
 | Manage all users / staff accounts | ✅ | staff only | — | — |
-| Facility & category management | ✅ | ✅ | view | view |
+| Facility CRUD | ✅ | ✅ | ✅ | — |
+| Facility browsing | ✅ | ✅ | ✅ | ✅ |
+| Category management | ✅ | ✅ | — | — |
 | Book a facility (for themselves) | ✅ | ✅ | ✅ | ✅ |
 | View bookings | all | all | all | own only |
 | Confirm / check in / complete / cancel bookings | ✅ | ✅ | ✅ | cancel own before start |
 | Pay a booking online | ✅ | ✅ | ✅ | ✅ |
 | View / record payments, refund (refund: admin·manager) | ✅ | ✅ | record | — |
-| View invoices | all | all | all | own |
-| Membership plans CRUD | ✅ | ✅ | — | — |
-| Subscribe to a membership plan | — | — | — | ✅ |
-| Staff schedules: assign (admin·manager) / view own | ✅ | ✅ | own | — |
-| Clock in / out & view attendance | ✅ | ✅ | own | — |
-| File maintenance reports / work them | ✅ | ✅ | report + start work | — |
-| Resolve / close maintenance, cancel memberships | ✅ | ✅ | — | — |
 | Personal profile & password | ✅ | ✅ | ✅ | ✅ |
+
+Invoices, membership plans, staff schedules/attendance, maintenance, equipment,
+promotions, notifications and analytics are **not exposed** in the delivered
+interface. Their controllers, route files and database tables remain in place
+for future phases, but their Express routers are not mounted and their frontend
+pages/routes are disabled.
 
 Role checks are enforced **on the server** with `authenticate` +
 `authorize(...roles)` middleware; the frontend only decides what to show.
@@ -53,8 +58,8 @@ The frontend uses a responsive admin shell shared by every page:
 - a dark, collapsible left sidebar with role-aware navigation groups
   (Overview, Management, Finance & Services, Administration), Lucide icons,
   active-route highlighting and icon tooltips when collapsed;
-- a sticky top header with breadcrumb + page title, global search, notification
-  bell, user menu (Profile, Settings, Logout) and a contextual primary action;
+- a sticky top header with breadcrumb + page title, global search, user menu
+  (Profile, Settings, Logout) and a contextual primary action;
 - a mobile slide-out drawer with an overlay and scroll lock;
 - a dashboard overview with KPI cards, an SVG revenue chart (daily / weekly /
   monthly), booking trend and status charts, today's bookings, facility
@@ -65,6 +70,12 @@ totals, comparison trends, chart series, today's schedule and recent activity in
 one request. Charts are small hand-built SVG/CSS components, so no chart
 dependency is added. Authentication pages use the same branding without the
 sidebar or header.
+
+**Booking entry points.** The header's **New booking** button, the dashboard's
+**Create booking** quick action and a facility's **Book this facility** action
+all open the same booking form. `/book` lets the user pick a facility first;
+`/facilities/:id/book` (also reachable as `/book?facility=:id`) preselects it.
+The form handles date, hourly slot, duration, notes and payment in one place.
 
 ## Reservation lifecycle
 
@@ -90,15 +101,15 @@ sidebar or header.
 - Online payment is simulated server-side and confirms the booking instantly.
 - At-center payments start as pending and are recorded when staff check the
   customer in.
-- Active members get their plan's discount (snapshot in `discount_amount`) on
-  new bookings; the booking and its `issued`/`paid` invoice are created together.
-- Cancelling or refunding a booking voids its invoice.
+- The retained Phase 3 backend still snapshots an active membership discount in
+  `discount_amount` and creates an invoice record with the booking. Neither is
+  surfaced in the delivered Phase 1–2 interface.
 - Old pending/confirmed bookings are lazily marked `no_show` when their end
   time has passed (there is no background scheduler).
 
 ## Database
 
-Phase 1–3 tables (`backend/database/schema.sql`):
+All tables (`backend/database/schema.sql`):
 
 | Table | Purpose |
 |---|---|
@@ -114,11 +125,13 @@ Phase 1–3 tables (`backend/database/schema.sql`):
 | `attendance` | one clock-in/out row per staff/day (`present`/`late`/`absent`) |
 | `maintenance_requests` | facility issues; active ones keep the facility in `maintenance` |
 
-Later phases add notifications, equipment, promotions and reviews.
-`backend/database/seed.sql` seeds the demo accounts, 7 categories, 10
-facilities, bookings across the whole lifecycle, payments/invoices,
-membership plans/memberships, next-week shifts, attendance and maintenance
-requests (all relative to the current date).
+Phase 3–5 tables (invoices, memberships, schedules, attendance, maintenance,
+notifications, equipment, promotions, reviews) are still created and seeded so
+the retained backend keeps working, but they are not surfaced in the delivered
+interface. `backend/database/seed.sql` seeds the demo accounts, categories,
+facilities, bookings across the whole lifecycle, payments/invoices, membership
+plans/memberships, next-week shifts, attendance and maintenance requests (all
+relative to the current date).
 
 > `npm run db:setup` **drops and recreates** the database. Run it at phase
 > boundaries or whenever you want a clean demo state.
@@ -246,7 +259,7 @@ return `401` when logged out and `403` when the role is not allowed.
 | GET | `/api/facilities` | public | List (`?search=&category_id=&status=`) |
 | GET | `/api/facilities/:id` | public | Facility details |
 | GET | `/api/facilities/:id/availability?date=YYYY-MM-DD` | public | Hourly slot grid with taken/past slots |
-| POST/PUT/DELETE | `/api/facilities…` | admin/manager | Manage facilities |
+| POST/PUT/DELETE | `/api/facilities…` | admin/manager/staff | Manage facilities |
 | GET/POST/PUT/DELETE | `/api/categories…` | read public / write admin·manager | Categories |
 | GET | `/api/dashboard/stats` | admin/manager/staff | Dashboard counts |
 
@@ -264,7 +277,12 @@ return `401` when logged out and `403` when the role is not allowed.
 | POST | `/api/reservations/:id/complete` | staff-side | Complete the session |
 | POST | `/api/reservations/:id/no-show` | staff-side | Mark a late booking as no-show |
 
-### Business operations (Phase 3)
+### Business operations (Phase 3) — source retained, routers not mounted
+
+Payments is part of the retained Phase 2 booking lifecycle and is still
+mounted. The remaining endpoints below exist only in source: their Express
+routers are not registered in `backend/app.js`, so requests return `404` until
+the features are deliberately re-enabled.
 
 | Method | Endpoint | Access | Purpose |
 |---|---|---|---|
@@ -305,7 +323,8 @@ Facility availability automatically rejects bookings while a facility has an
   calculations, status transitions and image type/size limits.
 - **Invoices and discounts** are generated server-side: invoice numbers come
   from the inserted row id, and membership discounts are recalculated on the
-  server (the booking page only previews them).
+  server. These belong to the retained Phase 3 API and are not surfaced in the
+  delivered interface.
 - **Errors** are logged server-side and returned as short generic JSON
   messages — no stack traces or credentials reach the client.
 - **Uploads** use multer with JPEG/PNG only, a 2 MB limit and server-generated
@@ -316,7 +335,9 @@ Facility availability automatically rejects bookings while a facility has an
 ## Notes / limitations
 
 - Online payment is simulated (`SIM-ONLINE-…` references); no external gateway.
-- Membership subscriptions are simulated — no recurring billing.
-- Notifications are not yet sent by email/SMS (Phase 4 adds in-app notifications).
-- QR check-in, equipment, promotions, reviews and analytics are planned for
-  Phases 4–5 (see `ROADMAP.md`).
+- The delivered app covers **Phase 1–2 only**. Phase 3–5 features (invoices,
+  memberships, schedules, attendance, maintenance, notifications, equipment,
+  promotions, reviews and analytics) are retained in the source code and
+  database but their API routers and frontend routes are disabled.
+- Notifications are not sent by email/SMS; in-app notifications are part of the
+  disabled Phase 4 UI.

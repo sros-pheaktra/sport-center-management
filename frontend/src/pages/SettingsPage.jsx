@@ -1,14 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
-  Bell,
   Check,
   ChevronRight,
   LayoutPanelLeft,
   ShieldCheck,
   User
 } from 'lucide-react'
-import { api } from '../api'
 import { useAuth } from '../context/AuthContext'
 import RoleBadge from '../components/RoleBadge'
 
@@ -42,19 +40,6 @@ function SettingRow({ icon: Icon, title, description, children }) {
 export default function SettingsPage() {
   const { user } = useAuth()
   const [collapsedByDefault, setCollapsedByDefault] = useState(readCollapsed)
-  const [unread, setUnread] = useState(null)
-
-  useEffect(() => {
-    let active = true
-
-    api('/notifications?limit=1')
-      .then((data) => {
-        if (active) setUnread(Number(data.unread_count) || 0)
-      })
-      .catch(() => {})
-
-    return () => { active = false }
-  }, [])
 
   const toggleSidebarDefault = () => {
     setCollapsedByDefault((current) => {
@@ -104,20 +89,6 @@ export default function SettingsPage() {
                   }`}
                 />
               </button>
-            </SettingRow>
-
-            <SettingRow
-              icon={Bell}
-              title="Notifications"
-              description="Review booking, payment, maintenance and membership updates."
-            >
-              <Link
-                to="/notifications"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-              >
-                {unread !== null && unread > 0 ? `${unread} unread` : 'Open inbox'}
-                <ChevronRight className="h-4 w-4" />
-              </Link>
             </SettingRow>
 
             <SettingRow
